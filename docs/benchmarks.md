@@ -73,6 +73,14 @@ The portable builder was separately executed on the same Spark using the existin
 
 The standalone loader and generation wrapper were then executed on the GPU. A Japanese smoke request returned `動作確認できました` in 8 output tokens and stopped normally. The same loaded model completed the decode sweep below. This validates those execution paths on GB10; it does not extend the standalone runner's coverage to the application's API or tool runner.
 
+## Standalone CLI validation
+
+A wheel built from commit `4cab80d85f2f5961a4f7d959fdd9eb770c33c305` was installed into a fresh package target on the same GB10. The test reused the pinned CUDA dependencies and existing source snapshots. It ran offline, with the production application's modules absent from the import path. It did not repeat a network download or a fresh dependency installation.
+
+The CLI rebuilt the exact overlay in 22.91 seconds and verified it successfully. Inference without explicit source-code trust was rejected before GPU allocation. A separate `generate` process returned the requested Japanese sentence and stopped normally. The `benchmark` command then passed all nine requests: Japanese short output, Japanese prose, retrieval from 8,527 input tokens, a native function call, continuation with a fixture tool result, three reasoning answers with correct final values, and a second Japanese prose request. The GPU was released when each CLI process exited.
+
+All functional requests finished normally or with the expected tool-call stop. The first prose sample omitted a Japanese particle and used an awkward verb form; passing the functional checks does not imply flawless language quality or broad task accuracy. The original application service and selected model were restored, with conversation history preserved. Full responses and checks are in [the standalone record](../benchmarks/standalone-gb10-20261019.json).
+
 ## Decode-only method
 
 `benchmark-decode` measures one generation stream at batch size 1 with the Goedel `turbo` path. The initial prompt encoder is synchronized once and the timer starts immediately afterward. Timing ends after `generate()` returns and the GPU completes its queued work. Later encoder passes that commit generated canvases remain inside the measured decode interval.

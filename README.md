@@ -94,7 +94,9 @@ This bounded sweep uses three English workloads, a 1,024-token output budget, an
 
 The original private integration passed Japanese conversation, retrieval from an 8,527-token input, native function calling, tool-result continuation and three reasoning requests. A separate application integration also completed conversation and a real terminal tool invocation. Those application components are not included here; the historical results do not substitute for testing this standalone CLI.
 
-This repository's standalone loader and generation wrapper were separately exercised on the same GB10: a short Japanese reply stopped normally, followed by 13 decode measurements. The runner's CPU tests also cover deferred kernel imports and the decode timer boundary. The decode sweep measures throughput and does not establish task accuracy.
+The standalone wheel was installed into a fresh target on the same GB10, reusing the pinned CUDA dependencies. With the application's modules unavailable, the CLI rebuilt and verified the overlay, generated Japanese text, and passed all nine functional requests covering Japanese, 8,527-token retrieval, native tools and three reasoning answers. Existing verified snapshots were reused; downloading and a fresh dependency installation were not repeated. See [the standalone validation record](benchmarks/standalone-gb10-20261019.json).
+
+The standalone loader also completed 13 decode measurements. The runner's CPU tests cover deferred kernel imports and the decode timer boundary. The decode sweep measures throughput and does not establish task accuracy.
 
 The model can repeat words or emit redundant tool delimiters. No stray `own` artifact appeared in the nine recorded direct requests, but that is not a guarantee. Refusal behavior has not been independently benchmarked, and the 262,144-token configured context has not been tested to its limit. Image and video inputs are outside this runner's validation scope.
 

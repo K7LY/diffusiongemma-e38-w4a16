@@ -1,0 +1,539 @@
+{
+  "schema_version": 1,
+  "date": "2026-10-19",
+  "complete": true,
+  "tested_code_commit": "4cab80d85f2f5961a4f7d959fdd9eb770c33c305",
+  "hardware": {
+    "platform": "DGX Spark",
+    "gpu": "GB10",
+    "unified_memory_gb": 128
+  },
+  "distribution": {
+    "format": "wheel",
+    "version": "0.1.0",
+    "sha256": "828de06b00d39dd90d14c3af82c7d74426df13fa17236e33d4fce35c02a3cc8b"
+  },
+  "environment": {
+    "python": "3.12.3",
+    "torch": "2.11.0+cu130",
+    "transformers": "5.12.1",
+    "triton": "3.6.0",
+    "dependencies": "Reused the installed pinned CUDA dependencies; installed the wheel into a fresh target.",
+    "snapshots": "Reused the existing pinned snapshots and rehashed them during build; no download repeated."
+  },
+  "isolation": {
+    "production_application_importable": false,
+    "separate_cli_processes": true,
+    "offline": true
+  },
+  "steps": {
+    "isolated_imports": {
+      "exit_code": 0,
+      "seconds": 0.011229149997234344,
+      "passed": true
+    },
+    "build": {
+      "exit_code": 0,
+      "seconds": 22.907180198002607,
+      "passed": true
+    },
+    "verify": {
+      "exit_code": 0,
+      "seconds": 0.3937073899433017,
+      "passed": true
+    },
+    "explicit_trust_required": {
+      "exit_code": 1,
+      "seconds": 0.04150295699946582,
+      "passed": true
+    },
+    "generate": {
+      "exit_code": 0,
+      "seconds": 17.152175699942745,
+      "passed": true
+    },
+    "functional_suite": {
+      "exit_code": 0,
+      "seconds": 38.66254633991048,
+      "passed": true
+    }
+  },
+  "overlay": {
+    "format": "dg-w4a16-e38-overlay-v1",
+    "quantization": "W4A16",
+    "base": {
+      "model_id": "GoedelMachines/diffusiongemma-26B-A4B-w4a16",
+      "revision": "0fede6e3e65d258d444822cfb6a79092cdc5c0af"
+    },
+    "source": {
+      "model_id": "Goodoldjam/DiffusionGemma-26B-E38-Abliterated-NVFP4",
+      "revision": "3f007177bf67706bd335f8275a1bd2657cd4e686"
+    },
+    "files": [
+      {
+        "path": "e38-overlay.safetensors",
+        "bytes": 372705672,
+        "sha256": "7a913d9bdb580fe06c42efc0833d3eab9ec7d2d255144e9d7b102458e124fec7"
+      }
+    ],
+    "tensors": [
+      {
+        "name": "model.decoder.layers.10.mlp.down_proj.weight",
+        "dtype": "BF16",
+        "shape": [
+          2816,
+          2112
+        ],
+        "sha256": "c5666613cc744736b2a9b781c0f731d2f2627d6938e40f7ccfc1692c326d817b"
+      },
+      {
+        "name": "model.decoder.layers.10.self_attn.o_proj.weight",
+        "dtype": "BF16",
+        "shape": [
+          2816,
+          4096
+        ],
+        "sha256": "3540c9dc4a94bb0b5a4279e86f0bb136b4f395bd3432c7bfac11b81a7405cb1a"
+      },
+      {
+        "name": "model.decoder.layers.11.mlp.down_proj.weight",
+        "dtype": "BF16",
+        "shape": [
+          2816,
+          2112
+        ],
+        "sha256": "45084b1d4ede2f2d37c8cac55a3d9245e6d01de265b068976f99c339e181393a"
+      },
+      {
+        "name": "model.decoder.layers.11.self_attn.o_proj.weight",
+        "dtype": "BF16",
+        "shape": [
+          2816,
+          8192
+        ],
+        "sha256": "c15e034e192b9d059054fa27cdc9c1197f4a3c01da3f6fc5b6931405f33960d5"
+      },
+      {
+        "name": "model.decoder.layers.12.mlp.down_proj.weight",
+        "dtype": "BF16",
+        "shape": [
+          2816,
+          2112
+        ],
+        "sha256": "7ff9068a6dad3f3646050842283706636f8564b3e507ef8304525f3cbc81c429"
+      },
+      {
+        "name": "model.decoder.layers.12.self_attn.o_proj.weight",
+        "dtype": "BF16",
+        "shape": [
+          2816,
+          4096
+        ],
+        "sha256": "353790a0bdf43b4605b18572677108b0a2e20769b521eb6f036512f715bc4ac6"
+      },
+      {
+        "name": "model.decoder.layers.13.mlp.down_proj.weight",
+        "dtype": "BF16",
+        "shape": [
+          2816,
+          2112
+        ],
+        "sha256": "140bd31658da265d670754470bba3b4d0770c66dd9fd7b514bf740da523b5281"
+      },
+      {
+        "name": "model.decoder.layers.13.self_attn.o_proj.weight",
+        "dtype": "BF16",
+        "shape": [
+          2816,
+          4096
+        ],
+        "sha256": "770dae8f332fdfab07a506b568f369e56d859443ca6c2fb04ff0144448aa9629"
+      },
+      {
+        "name": "model.decoder.layers.14.mlp.down_proj.weight",
+        "dtype": "BF16",
+        "shape": [
+          2816,
+          2112
+        ],
+        "sha256": "1dfd318a915cb298e58d9aff6442809bf750ec67b1df01977e24b2e8a1008fb6"
+      },
+      {
+        "name": "model.decoder.layers.14.self_attn.o_proj.weight",
+        "dtype": "BF16",
+        "shape": [
+          2816,
+          4096
+        ],
+        "sha256": "2f7ea656b3365a320028185c2220fdb17600f7499e0cd5d5d202744fb1b229b5"
+      },
+      {
+        "name": "model.decoder.layers.15.mlp.down_proj.weight",
+        "dtype": "BF16",
+        "shape": [
+          2816,
+          2112
+        ],
+        "sha256": "d8043876571829baf038772dfddd3d2c04caa8e54e5c308b6b8358785cc4c38b"
+      },
+      {
+        "name": "model.decoder.layers.15.self_attn.o_proj.weight",
+        "dtype": "BF16",
+        "shape": [
+          2816,
+          4096
+        ],
+        "sha256": "032ccdb750a04b38caec511b6cfce87328107bafe80d9f29fbc0958853621ce9"
+      },
+      {
+        "name": "model.decoder.layers.16.mlp.down_proj.weight",
+        "dtype": "BF16",
+        "shape": [
+          2816,
+          2112
+        ],
+        "sha256": "6403b7bcaa0b07faab50f00b7601dd08ca66a3bebb5cc7bbcdb5233181385ccf"
+      },
+      {
+        "name": "model.decoder.layers.16.self_attn.o_proj.weight",
+        "dtype": "BF16",
+        "shape": [
+          2816,
+          4096
+        ],
+        "sha256": "5015d31c7b132209638b1925d78adc12089d09ea2b747ebb93af4aa4f4904f23"
+      },
+      {
+        "name": "model.decoder.layers.7.mlp.down_proj.weight",
+        "dtype": "BF16",
+        "shape": [
+          2816,
+          2112
+        ],
+        "sha256": "69fed3b850e832f961011ee84252ed90195a653c341614bfc64de71164ccc17a"
+      },
+      {
+        "name": "model.decoder.layers.7.self_attn.o_proj.weight",
+        "dtype": "BF16",
+        "shape": [
+          2816,
+          4096
+        ],
+        "sha256": "a7f23d28eaf9b1f23916acfa31889dd9c09a7995c97be84a4765ccfc242060d8"
+      },
+      {
+        "name": "model.decoder.layers.8.mlp.down_proj.weight",
+        "dtype": "BF16",
+        "shape": [
+          2816,
+          2112
+        ],
+        "sha256": "42365c0945e3055e22684b08387259a78ae584157a08d98f2cd663a1c2b6f894"
+      },
+      {
+        "name": "model.decoder.layers.8.self_attn.o_proj.weight",
+        "dtype": "BF16",
+        "shape": [
+          2816,
+          4096
+        ],
+        "sha256": "deb7efe98ea701df46bbd285d48827c0d4ce92ef2941ab86f7f33876dfb3ce5a"
+      },
+      {
+        "name": "model.decoder.layers.9.mlp.down_proj.weight",
+        "dtype": "BF16",
+        "shape": [
+          2816,
+          2112
+        ],
+        "sha256": "41b1b374cf77b672d5f67833779678c500c21696d4ca6e122f11b026ce4b91c1"
+      },
+      {
+        "name": "model.decoder.layers.9.self_attn.o_proj.weight",
+        "dtype": "BF16",
+        "shape": [
+          2816,
+          4096
+        ],
+        "sha256": "2f3415d433a90dce089f3eb78fba2dfc40ba10d67bf3269f84e435b9187f589b"
+      }
+    ]
+  },
+  "generate": {
+    "message": {
+      "role": "assistant",
+      "content": "動作確認できました",
+      "reasoning_content": ""
+    },
+    "finish_reason": "stop",
+    "usage": {
+      "prompt_tokens": 22,
+      "completion_tokens": 8,
+      "total_tokens": 30
+    },
+    "timings": {
+      "generation_seconds": 1.4196176410187036,
+      "first_finalized_canvas_seconds": 1.4192928420379758,
+      "delivery": "buffered"
+    },
+    "wall_seconds": 1.5296129810158163,
+    "output_tokens_per_second": 5.2300811377053025
+  },
+  "functional_suite": {
+    "schema_version": 1,
+    "complete": true,
+    "delivery": "local finalized response",
+    "health_after_load": {
+      "status": "ok",
+      "model": "diffusion-gemma",
+      "context_length": 262144,
+      "streaming": "buffered_finalized_canvases",
+      "busy": false,
+      "memory": {
+        "cuda_allocated_bytes": 18502128640,
+        "cuda_reserved_bytes": 18935185408,
+        "cuda_peak_allocated_bytes": 18548265984
+      },
+      "execution": {
+        "format": "dg-w4a16-e38-overlay-v1",
+        "base": {
+          "model_id": "GoedelMachines/diffusiongemma-26B-A4B-w4a16",
+          "revision": "0fede6e3e65d258d444822cfb6a79092cdc5c0af"
+        },
+        "source": {
+          "model_id": "Goodoldjam/DiffusionGemma-26B-E38-Abliterated-NVFP4",
+          "revision": "3f007177bf67706bd335f8275a1bd2657cd4e686"
+        },
+        "overlay_sha256": "7a913d9bdb580fe06c42efc0833d3eab9ec7d2d255144e9d7b102458e124fec7",
+        "modified_dense_tensors": 20,
+        "execution": "Goedel fast W4A16 turbo with dense BF16 E38 overlay",
+        "expert_requantization": false
+      }
+    },
+    "requests": {
+      "japanese": {
+        "message": {
+          "role": "assistant",
+          "content": "動作確認できました。",
+          "reasoning_content": ""
+        },
+        "finish_reason": "stop",
+        "usage": {
+          "prompt_tokens": 22,
+          "completion_tokens": 9,
+          "total_tokens": 31
+        },
+        "timings": {
+          "generation_seconds": 0.29732075391802937,
+          "first_finalized_canvas_seconds": 0.2970566420117393,
+          "delivery": "buffered"
+        },
+        "wall_seconds": 0.3889870500424877,
+        "output_tokens_per_second": 23.137017026702974
+      },
+      "throughput": {
+        "message": {
+          "role": "assistant",
+          "content": "キャッシュ（Cache）とは、コンピュータシステムやネットワークにおいて、頻繁に使用するデータやプログラム一時的に蓄えておくための「高速な記憶領域」のことです。\n\n**仕組み**\nキャッシュの基本的な仕組みは、処理速度の速いCPUと、大容量だが低速なメインメモリ（主記憶）やストレージ（記憶装置）の間に配置されることです。CPUがデータを必要とする際、まずキャッシュメモリを探しに行きます。そこに目的のデータが存在する場合を「キャッシュヒット」と呼び、非常に高速で処理が行えます。一方、見つからない場合（キャッシュミス）は、低速なメインメモリなどからデータを読み出し、同時にキャッシュにも書き込んで次回以降に備えることで、全体の処理の効率化を図っています。\n\n**利点**\nキャッシュを利用する最大の利点は、**処理速度の劇的な向上**です。低速なデバイスに直接アクセスする回数を減るため、システム全体のレスポンスが速くなります。また、ネットワーク通信においては、サーバーやデータベースへの負荷を軽減し、リソースを効率的に活用できる効果もあります。\n\n現代のIT技術において、Webブラウザのキャッシュ（画像などの保存）やデータベースのキャッシュ、コンテンツ配信ネットワーク（CDN）など、キャッシュの仕組みは、快適なデジタル体験を実現するために不可欠な技術となっています。",
+          "reasoning_content": ""
+        },
+        "finish_reason": "stop",
+        "usage": {
+          "prompt_tokens": 27,
+          "completion_tokens": 280,
+          "total_tokens": 307
+        },
+        "timings": {
+          "generation_seconds": 3.451940009952523,
+          "first_finalized_canvas_seconds": 2.606168092926964,
+          "delivery": "buffered"
+        },
+        "wall_seconds": 3.5434346300316975,
+        "output_tokens_per_second": 79.01937787335315
+      },
+      "long_input": {
+        "message": {
+          "role": "assistant",
+          "content": "紫陽花42",
+          "reasoning_content": ""
+        },
+        "finish_reason": "stop",
+        "usage": {
+          "prompt_tokens": 8527,
+          "completion_tokens": 10,
+          "total_tokens": 8537
+        },
+        "timings": {
+          "generation_seconds": 4.181279174983501,
+          "first_finalized_canvas_seconds": 4.181142600020394,
+          "delivery": "buffered"
+        },
+        "wall_seconds": 4.291441687033512,
+        "output_tokens_per_second": 2.33021924315429
+      },
+      "native_tool_call": {
+        "message": {
+          "role": "assistant",
+          "content": null,
+          "reasoning_content": "",
+          "tool_calls": [
+            {
+              "id": "call_0776b154336e457aa5e6312999d7699e",
+              "type": "function",
+              "function": {
+                "name": "read_marker",
+                "arguments": "{}"
+              }
+            }
+          ]
+        },
+        "finish_reason": "tool_calls",
+        "usage": {
+          "prompt_tokens": 81,
+          "completion_tokens": 13,
+          "total_tokens": 94
+        },
+        "timings": {
+          "generation_seconds": 0.31473916000686586,
+          "first_finalized_canvas_seconds": 0.3144608569564298,
+          "delivery": "buffered"
+        },
+        "wall_seconds": 0.4217359049944207,
+        "output_tokens_per_second": 30.824978015974196
+      },
+      "native_tool_response": {
+        "message": {
+          "role": "assistant",
+          "content": "`read_marker`ツールを使用して取得した合言葉は「**桔梗73**」です。",
+          "reasoning_content": "The user wants to get a \"passphrase\" (合言葉) using the `read_marker` tool. I have called `read_marker()` and it returned `{\"marker\":\"桔梗73\"}`. Therefore, the passphrase is \"桔梗73\"."
+        },
+        "finish_reason": "stop",
+        "usage": {
+          "prompt_tokens": 115,
+          "completion_tokens": 80,
+          "total_tokens": 195
+        },
+        "timings": {
+          "generation_seconds": 1.03100914391689,
+          "first_finalized_canvas_seconds": 1.0308220559963956,
+          "delivery": "buffered"
+        },
+        "wall_seconds": 1.123565140995197,
+        "output_tokens_per_second": 71.20192419741686
+      },
+      "thinking_1": {
+        "message": {
+          "role": "assistant",
+          "content": "17 × 19 = 323\n323 + 23 = 346\n\n答えは346です。",
+          "reasoning_content": "*   Expression: $17 \\times 19 + 23$\n    *   Step 1: Calculate $17 \\times 19$.\n        *   Method A: $17 \\times (20 - 1) = 340 - 17 = 323$.\n        *   Method B: $(10 + 7) \\times 19 = 190 + 133 = 323$.\n    *   Step 2: Add 23 to the result.\n        *   $323 + 23 = 346$.\n\n    *   $17 \\times 19 = 323$ (Correct)\n    *   $323 + 23 = 346$ (Correct)\n\n    *   Format required: \"答えは[数値]です。\"\n    *   Value: 346."
+        },
+        "finish_reason": "stop",
+        "usage": {
+          "prompt_tokens": 59,
+          "completion_tokens": 243,
+          "total_tokens": 302
+        },
+        "timings": {
+          "generation_seconds": 1.614310221048072,
+          "first_finalized_canvas_seconds": 1.6140585739631206,
+          "delivery": "buffered"
+        },
+        "wall_seconds": 1.7066169230965897,
+        "output_tokens_per_second": 142.3869625991321
+      },
+      "thinking_2": {
+        "message": {
+          "role": "assistant",
+          "content": "17 × 19 = 323 となり、323 + 23 = 346 となります。\n\n答えは346です。",
+          "reasoning_content": "*   Expression: $17 \\times 19 + 23$\n    *   Step 1: Calculate $17 \\times 19$.\n        *   Method A: $17 \\times (20 - 1) = 340 - 17 = 323$.\n        *   Method B: $(18 - 1) \\times 19 = 18 \\times 19 - 19 = 342 - 19 = 323$.\n        *   Method C: $17 \\times 19$ directly:\n            $10 \\times 19 = 190$\n            $7 \\times 19 = 133$\n            $190 + 133 = 323$. Correct.\n    *   Step 2: Add 23 to the result of Step 1.\n        *   $323 + 23 = 346$.\n\n    *   $17 \\times 19 = 323$\n    *   $323 + 23 = 346$\n\n    *   Required format: 「答えは[数値]です。」\n    *   Content: 答えは346です。"
+        },
+        "finish_reason": "stop",
+        "usage": {
+          "prompt_tokens": 59,
+          "completion_tokens": 329,
+          "total_tokens": 388
+        },
+        "timings": {
+          "generation_seconds": 3.125660571968183,
+          "first_finalized_canvas_seconds": 2.009633471025154,
+          "delivery": "buffered"
+        },
+        "wall_seconds": 3.2184413390932605,
+        "output_tokens_per_second": 102.22339490975156
+      },
+      "thinking_3": {
+        "message": {
+          "role": "assistant",
+          "content": "17 × 19 + 23 を計算します。\n\nまず、17 × 19 を計算します。\n17 × 19 = 17 × (20 - 1) = 340 - 17 = 323\n\n次に、その結果に 23 を足します。\n323 + 23 = 346\n\n答えは346です。",
+          "reasoning_content": "計算式：$17 \\times 19 + 23$\n\n    *   Step 1: Calculate $17 \\times 19$.\n        *   Method A: $17 \\times (20 - 1) = 340 - 17 = 323$.\n        *   Method B: $(20 - 3) \\times 19 = 380 - 57 = 323$.\n        *   Method C: $17 \\times 19 = 170 + 153 = 323$.\n    *   Step 2: Add 23 to the result of Step 1.\n        *   $323 + 23 = 346$.\n\n    *   $17 \\times 19 = 323$\n    *   $323 + 23 = 346$\n「答えは346です。」"
+        },
+        "finish_reason": "stop",
+        "usage": {
+          "prompt_tokens": 59,
+          "completion_tokens": 315,
+          "total_tokens": 374
+        },
+        "timings": {
+          "generation_seconds": 2.437481636996381,
+          "first_finalized_canvas_seconds": 1.8563083969056606,
+          "delivery": "buffered"
+        },
+        "wall_seconds": 2.5301929989364,
+        "output_tokens_per_second": 124.49643174746528
+      },
+      "japanese_prose_repeat": {
+        "message": {
+          "role": "assistant",
+          "content": "キャッシュ（Cache）とは、コンピュータやネットワークシステムにおいて、「頻繁に使用するデータを一時的に蓄えておく高速な記憶領域」のことです。\n\n**【仕組み】**\n通常、CPU（中央処理装置）とメインメモリ（主記憶）、あるいはストレージ（SSDやHDD）の間には、処理速度に大きな差があります。この速度差を埋めるために、CPUとメインメモリの間に配置されるのが「キャッシュメモリ」です。\nCPUがデータを要求する際、まずキャッシュ内を探しに行きます。データがキャッシュにあれば（キャッシュヒット）、即座に処理を開始できます。データがなければ（キャッシュミス）、メインメモリなどからデータを読み出し、同時に次回のためにデータをキャッシュ内にも保存します。\n\n**【利点】**\nキャッシュの最大の利点は、**処理速度の劇的な向上**です。頻繁にアクセスするデータやプログラムをキャッシュ側に配置することで、遅いストレージへのアクセス時間を大幅に削減し、システム全体の動作をスムーズにします。\nまた、ネットワークにおいては、Webサーバーの応答データをローカル側にキャッシュすることで、サーバーの負荷を軽減し、ユーザーにとっての待ち時間を短縮する効果があります。\n\nこのように、キャッシュは「データの再利用」を効率化し、現代のITシステムにおいてパフォーマンスを極大化するための不可欠な技術となっています。",
+          "reasoning_content": ""
+        },
+        "finish_reason": "stop",
+        "usage": {
+          "prompt_tokens": 27,
+          "completion_tokens": 280,
+          "total_tokens": 307
+        },
+        "timings": {
+          "generation_seconds": 4.098260700935498,
+          "first_finalized_canvas_seconds": 2.4874024899909273,
+          "delivery": "buffered"
+        },
+        "wall_seconds": 4.190460482030176,
+        "output_tokens_per_second": 66.81843229418712
+      }
+    },
+    "health_after_generation": {
+      "status": "ok",
+      "model": "diffusion-gemma",
+      "context_length": 262144,
+      "streaming": "buffered_finalized_canvases",
+      "busy": false,
+      "memory": {
+        "cuda_allocated_bytes": 18511227904,
+        "cuda_reserved_bytes": 18872270848,
+        "cuda_peak_allocated_bytes": 21907255296
+      },
+      "execution": {
+        "format": "dg-w4a16-e38-overlay-v1",
+        "base": {
+          "model_id": "GoedelMachines/diffusiongemma-26B-A4B-w4a16",
+          "revision": "0fede6e3e65d258d444822cfb6a79092cdc5c0af"
+        },
+        "source": {
+          "model_id": "Goodoldjam/DiffusionGemma-26B-E38-Abliterated-NVFP4",
+          "revision": "3f007177bf67706bd335f8275a1bd2657cd4e686"
+        },
+        "overlay_sha256": "7a913d9bdb580fe06c42efc0833d3eab9ec7d2d255144e9d7b102458e124fec7",
+        "modified_dense_tensors": 20,
+        "execution": "Goedel fast W4A16 turbo with dense BF16 E38 overlay",
+        "expert_requantization": false
+      }
+    }
+  },
+  "cleanup": {
+    "gpu_released_after_cli_exit": true,
+    "production_unit_unchanged": true,
+    "original_model_restored": true,
+    "history_preserved": true
+  }
+}
