@@ -4,7 +4,7 @@ Build a small E38 weight overlay for the fast Goedel W4A16 DiffusionGemma checkp
 
 The recipe retains the base checkpoint's quantized experts and fast execution path. It copies 20 BF16 projection tensors from the pinned E38 checkpoint into their existing tied parameters. The locally built overlay adds about **373 MB**; this repository distributes code, documentation and measurements, without model weights or third-party kernels.
 
-On one GB10 / 128 GB Spark, the original integration produced Japanese prose at **63–84 output tokens/s**, including input processing, with **18.51 GB idle / 21.91 GB peak Torch CUDA allocation**. These are a small workload sample, not a general benchmark. See [measurements and limitations](docs/benchmarks.md).
+On one GB10 / 128 GB Spark, the original integration produced Japanese prose at **63–84 output tokens/s**, including input processing, with **18.51 GB idle / 21.91 GB peak Torch CUDA allocation**. A separate warm, batch-1 English reasoning measurement at the native 48-step limit reached **209.14 tokens/s median / 229.60 peak**, excluding initial prefill. Its 1,024-token output budget cut off the reasoning before completion. These are small workload samples, not a general benchmark. See [measurements and limitations](docs/benchmarks.md).
 
 ## Sources
 
@@ -78,9 +78,23 @@ e38-w4a16 benchmark \
 
 These commands run text inference as an explicitly invoked process. This repository does not install a resident agent, system service or API server.
 
+For single-stream decode timing with initial prompt processing excluded:
+
+```sh
+e38-w4a16 benchmark-decode \
+  --base-dir models/base \
+  --overlay-dir models/e38-overlay \
+  --trust-base-code \
+  --output results-decode.json
+```
+
+This bounded sweep uses three English workloads, a 1,024-token output budget, and 48/16/8 denoising-step limits. It repeats the fastest standard and speed-oriented workload/settings pairs with different seeds. The measured 8-step code samples contained malformed code and extensive repetition despite higher raw throughput. See [the timing boundary and results](docs/benchmarks.md#decode-only-method).
+
 ## Validation scope
 
 The original private integration passed Japanese conversation, retrieval from an 8,527-token input, native function calling, tool-result continuation and three reasoning requests. A separate application integration also completed conversation and a real terminal tool invocation. Those application components are not included here; the historical results do not substitute for testing this standalone CLI.
+
+This repository's standalone loader and generation wrapper were separately exercised on the same GB10: a short Japanese reply stopped normally, followed by 13 decode measurements. The runner's CPU tests also cover deferred kernel imports and the decode timer boundary. The decode sweep measures throughput and does not establish task accuracy.
 
 The model can repeat words or emit redundant tool delimiters. No stray `own` artifact appeared in the nine recorded direct requests, but that is not a guarantee. Refusal behavior has not been independently benchmarked, and the 262,144-token configured context has not been tested to its limit. Image and video inputs are outside this runner's validation scope.
 

@@ -161,13 +161,64 @@ class LoaderTests(unittest.TestCase):
                     self.assertFalse(metadata['expert_requantization'])
                     apply.assert_called_once()
                 self.assertEqual(sys.path, old_path)
-                self.assertEqual(sys.meta_path, old_finders)
+                self.assertEqual([item for item in sys.meta_path
+                                  if not isinstance(item, loader._PinnedImports)], old_finders)
+                self.assertEqual(sum(isinstance(item, loader._PinnedImports) for item in sys.meta_path), 1)
                 self.assertEqual(sys.dont_write_bytecode, old_bytecode)
                 self.assertFalse((root / 'kernels' / '__pycache__').exists())
             finally:
+                sys.meta_path[:] = old_finders
                 for name in ('kernels', 'kernels.load_w4_checkpoint'):
                     sys.modules.pop(name, None)
                 sys.modules.update(previous)
+
+    def test_generation_can_import_a_flat_kernel_lazily_after_load_returns(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            (root / 'kernels').mkdir()
+            sources = {
+                'load_w4_checkpoint': "from pack_experts import DeferredModel\ndef load_fast(*a, **k):\n    return DeferredModel(), 'tokenizer'\n",
+                'pack_experts': "class DeferredModel:\n    def generate(self):\n        from fused_moe_w4_v2 import marker\n        return marker\n",
+                'fused_moe_w4_v2': "marker = 'generated with lazy pinned kernel'\n",
+            }
+            for name, code in sources.items():
+                (root / 'kernels' / (name + '.py')).write_text(code)
+            spec = {'files': [{'path': f'kernels/{name}.py'} for name in sources]}
+            names = ['kernels', 'kernels.load_w4_checkpoint', *sources]
+            previous = {name: sys.modules.pop(name) for name in names if name in sys.modules}
+            old_finders, old_bytecode = list(sys.meta_path), sys.dont_write_bytecode
+            try:
+                with patch.object(cp, 'verify_snapshot', return_value=spec), \
+                     patch.object(cp, 'verify_overlay', return_value=receipt()), \
+                     patch.object(loader, '_apply_overlay', return_value=20):
+                    model, _, _ = loader.load_model(root, root, trust_base_code=True)
+                    self.assertNotIn('fused_moe_w4_v2', sys.modules)
+                    self.assertEqual(sys.dont_write_bytecode, old_bytecode)
+                    self.assertEqual(model.generate(), 'generated with lazy pinned kernel')
+                    self.assertFalse((root / 'kernels' / '__pycache__').exists())
+                    resolver = [item for item in sys.meta_path if isinstance(item, loader._PinnedImports)]
+                    loader.load_model(root, root, trust_base_code=True)
+                    self.assertEqual([item for item in sys.meta_path if isinstance(item, loader._PinnedImports)], resolver)
+                    other = root / 'other'
+                    other.mkdir()
+                    with self.assertRaisesRegex(RuntimeError, 'different checkpoint resolver'):
+                        loader.load_model(other, root, trust_base_code=True)
+            finally:
+                sys.meta_path[:] = old_finders
+                for name in names:
+                    sys.modules.pop(name, None)
+                sys.modules.update(previous)
+
+    def test_failed_load_removes_new_resolver_and_restores_process_settings(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            before = (list(sys.meta_path), list(sys.path), sys.dont_write_bytecode)
+            with patch.object(cp, 'verify_snapshot', return_value={'files': []}), \
+                 patch.object(cp, 'verify_overlay', return_value=receipt()), \
+                 patch.object(loader.importlib, 'import_module', side_effect=RuntimeError('load failed')):
+                with self.assertRaisesRegex(RuntimeError, 'load failed'):
+                    loader.load_model(root, root, trust_base_code=True)
+            self.assertEqual((list(sys.meta_path), list(sys.path), sys.dont_write_bytecode), before)
 
 
 if __name__ == '__main__':

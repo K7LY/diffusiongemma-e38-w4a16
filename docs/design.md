@@ -28,6 +28,8 @@ Build and verification treat checkpoints as data. Inference crosses a different 
 
 Model files, credentials, caches and generated outputs remain local. The repository contains the recipe and sanitized measurements. Service lifecycle, API authentication, tool execution and application permissions belong to the integrating application and are outside this package.
 
+The verified import resolver remains installed after successful loading because the upstream expert implementation imports some kernels during generation. It resolves only the pinned source modules and suppresses bytecode writes for them. A failed load removes its newly installed resolver; switching checkpoint roots requires a fresh process.
+
 ## Generation and measurement
 
 DiffusionGemma commits tokens from a denoised canvas. Output accounting must exclude uncommitted canvas padding and stop at the actual generation terminator. The original integration used the generation configuration's padding and EOS IDs, rather than assuming the tokenizer's padding ID matched them.

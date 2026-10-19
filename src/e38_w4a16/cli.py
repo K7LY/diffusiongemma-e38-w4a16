@@ -37,6 +37,9 @@ def parser():
     benchmark = commands.add_parser('benchmark', help='Measure Japanese, retrieval, reasoning and native tools')
     _model_arguments(benchmark)
     benchmark.add_argument('--output', type=Path, required=True)
+    decode = commands.add_parser('benchmark-decode', help='Measure decode after initial prefill with a bounded speed sweep')
+    _model_arguments(decode)
+    decode.add_argument('--output', type=Path, required=True)
     return root
 
 
@@ -151,9 +154,13 @@ def main(argv=None):
         elif options.command == 'generate':
             engine = new_engine(options)
             result = generate(engine, options.prompt, thinking=options.thinking, max_tokens=options.max_new_tokens)
-        else:
+        elif options.command == 'benchmark':
             engine = new_engine(options)
             result = benchmark(engine, options.output)
+        else:
+            from .decode_benchmark import run_sweep
+            engine = new_engine(options)
+            result = run_sweep(engine.model, engine.tokenizer, options.output)
         print(json.dumps(result, ensure_ascii=False, indent=2))
     except (ValueError, OSError, ImportError, RuntimeError) as error:
         print(type(error).__name__ + ': ' + str(error), file=sys.stderr)

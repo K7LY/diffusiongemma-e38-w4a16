@@ -1,6 +1,6 @@
 # DGX Spark measurements
 
-These results were recorded on October 19, 2026, on one NVIDIA DGX Spark with a GB10 GPU and 128 GB unified memory. They describe the original integration of this overlay recipe. They are historical measurements, not GPU validation of every later standalone CLI revision.
+These results were recorded on October 19, 2026, on one NVIDIA DGX Spark with a GB10 GPU and 128 GB unified memory. The application measurements and the standalone decode measurements use different timing boundaries, described below.
 
 ## Environment
 
@@ -16,7 +16,7 @@ These results were recorded on October 19, 2026, on one NVIDIA DGX Spark with a 
 | Base loader mode | Goedel W4A16 `turbo` |
 | Workload | One GPU model, sequential requests |
 
-The input snapshots are pinned in the [README](../README.md). The measurement suite used the original application API, with buffered output delivery. No model weights or private application records are included in this repository.
+The input snapshots are pinned in the [README](../README.md). The first measurement suite used the original application API, with buffered output delivery. The later decode sweep used this repository's loader and benchmark module directly. No model weights or private application records are included in this repository.
 
 ## Observed results
 
@@ -69,4 +69,27 @@ The sanitized per-request outputs, token counts and allocator measurements are i
 
 ## Standalone builder validation
 
-The portable builder was separately executed on the same Spark using the existing pinned input files. It rehashed all 50 base and 14 E38 source files and compared all 987 dense tensors on CPU. The resulting 372,705,672-byte overlay exactly matched the adopted artifact SHA256. No Torch or Transformers module was imported; the production model operation and GPU process list were unchanged. See [the CPU validation record](../benchmarks/portable-cpu-20261019.json). Standalone CLI GPU generation remains unverified.
+The portable builder was separately executed on the same Spark using the existing pinned input files. It rehashed all 50 base and 14 E38 source files and compared all 987 dense tensors on CPU. The resulting 372,705,672-byte overlay exactly matched the adopted artifact SHA256. No Torch or Transformers module was imported during the build; the production model operation and GPU process list were unchanged. See [the CPU validation record](../benchmarks/portable-cpu-20261019.json).
+
+The standalone loader and generation wrapper were then executed on the GPU. A Japanese smoke request returned `動作確認できました` in 8 output tokens and stopped normally. The same loaded model completed the decode sweep below. This validates those execution paths on GB10; it does not extend the standalone runner's coverage to the application's API or tool runner.
+
+## Decode-only method
+
+`benchmark-decode` measures one generation stream at batch size 1 with the Goedel `turbo` path. The initial prompt encoder is synchronized once and the timer starts immediately afterward. Timing ends after `generate()` returns and the GPU completes its queued work. Later encoder passes that commit generated canvases remain inside the measured decode interval.
+
+Tokenization, initial prompt setup/prefill, streamer delivery, final CPU token transfer and detokenization are outside this interval. No streamer or per-forward synchronization is used. The numerator counts actual output through the first generation EOS token, inclusive, and excludes subsequent canvas padding. The 1,024-token budget is a multiple of the fixed 256-token canvas.
+
+The sweep compares English code, mathematical reasoning and technical prose at 48, 16 and 8 maximum denoising steps. Other native sampler settings are unchanged and recorded in the result. One 256-token warmup is run for each setting. The fastest standard and overall workload/settings pairs are repeated with two more seeds; peak, median and aggregate output/decode-time rates are reported separately. This is a bounded search, not proof of a hardware-wide maximum or equivalent quality at reduced step limits.
+
+## Decode-only results
+
+| Repeated workload | Maximum denoising steps | Samples | Median tokens/s | Peak tokens/s | Aggregate tokens/s |
+| --- | --- | --- | --- | --- | --- |
+| Mathematical reasoning, thinking enabled | 48 (native default) | 3 | **209.14** | **229.60** | 212.77 |
+| Python code | 8 | 3 | 245.69 | 246.26 | 240.08 |
+
+The native-default peak generated 1,024 tokens in 4.460 seconds of decode time. Across the three initial native-default workloads, rates ranged from 124.10 to 201.50 tokens/s before repeating the fastest pair. The result depends strongly on the prompt and denoising trajectory.
+
+The 8-step code output visibly deteriorated: inspected samples contained malformed Python and hundreds of repeated newline characters. Its higher raw token rate must not be presented as useful code-generation performance. No accuracy benchmark was performed at any step setting.
+
+All 13 measured samples reached the 1,024-token budget without EOS. In particular, the native-default mathematical output was an incomplete reasoning trace, not a completed proof. These results measure output throughput within that budget, not successful task completion. Full prompts, generated text, per-sample timings, sampler settings and output-inspection notes are preserved in [the decode record](../benchmarks/gb10-decode-20261019.json).

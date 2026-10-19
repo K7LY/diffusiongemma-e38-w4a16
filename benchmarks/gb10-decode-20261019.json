@@ -1,0 +1,346 @@
+{
+  "schema_version": 1,
+  "complete": true,
+  "batch_size": 1,
+  "boundary": "After initial encoder prefill through final GPU completion; includes later canvas encoder commits",
+  "excluded": [
+    "tokenization",
+    "initial prompt prefill",
+    "streamer delivery",
+    "final CPU transfer and detokenization"
+  ],
+  "warmup": "One 256-token run per denoising-step setting; excluded from results",
+  "quality_note": "16/8 step limits may reduce quality. Output inspection is separate from throughput.",
+  "cases": {
+    "python_module": {
+      "thinking": false,
+      "prompt": "Write a complete Python 3 module implementing an LRU cache with a doubly linked list, a TTL cache, unit tests, type annotations, docstrings, and an executable demonstration. Return code only. Include thorough tests and examples."
+    },
+    "mathematical_proof": {
+      "thinking": true,
+      "prompt": "Derive the formula for the sum of squares from 1 to n using telescoping cubes, verify it explicitly for n=1 through n=10, and then prove it by mathematical induction. Show all intermediate algebra and checks."
+    },
+    "technical_essay": {
+      "thinking": false,
+      "prompt": "Write a detailed technical explanation of CPU caches, cache coherence, locality, memory bandwidth, and how these affect matrix multiplication. Include practical examples and implementation advice. Write at least 1800 words in English."
+    }
+  },
+  "samples": [
+    {
+      "prompt_tokens": 55,
+      "completion_tokens": 1024,
+      "output_budget": 1024,
+      "max_denoising_steps": 48,
+      "seed": 42,
+      "thinking": false,
+      "terminated": false,
+      "prompt_setup_and_prefill_seconds": 0.0719506930327043,
+      "decode_seconds": 7.736979782930575,
+      "generation_seconds": 7.80893047596328,
+      "decode_tokens_per_second": 132.35138629406296,
+      "generated_text": "<|channel>thought\n<channel|>```python\nimport time\nfrom typing import Any, Dict, Optional, TypeVar, Generic\n\nK = TypeVar(\"K\")\nV = TypeVar(\"V\")\n\nclass Node(Generic[K, V]):\n    \"\"\"A node in the doubly linked list.\"\"\"\n    def __init__(self, key: K, value: V, expiry: float):\n        self.key = key\n        self.value = value\n        self.expiry = expiry\n        self.prev: Optional['Node[K, V]'] = None\n        self.next: Optional['Node[K, V]'] = None\n\nclass LRUTTLCache(Generic[K, V]):\n    \"\"\"\n    An LRU Cache with Time-To-Live (TTL) support.\n    Attributes:\n        capacity (int): Maximum number of items in cache.\n        ttl (int): Time in seconds before entries expire.\n        cache (dict): Mapping of keys to Nodes.\n        head (Node): Sentinel head for the doubly linked list (most recent).\n        tail (Node): Sentinel tail for the doubly linked list (least recent).\n    \"\"\"\n\n    def __init__(self, capacity: int, ttl: int):\n        if capacity <= 0:\n            raise ValueError(\"Capacity must be positive\")\n        self.capacity = capacity\n        self.ttl = ttl\n        self.cache: Dict[K, Node[K, V]] = {}\n        \n        # Sentinels\n        self.head = Node[K, V](None, None, 0.0)\n        self.tail = Node[K, V](None, None, 0.0)\n        self.head.next = self.tail\n        self.tail.prev = self.head\n\n    def _remove(self, node: Node[K, V]):\n        \"\"\"Remove a node from the linked list logic.\"\"\"\n        node.prev.next = node.next\n        node.next.prev = node.prev\n\n    def _add_to_head(self, node: Node[K, V]):\n        \"\"\"Add a node right after the head sentinel.\"\"\"\n        node.next = self.head.next\n        node.prev = self.head\n        self.head.next.prev = node\n        self.head.next = node\n\n    def get(self, key: K) -> Optional[V]:\n        \"\"\"Retrieve an item. Returns None if expired or missing.\"\"\"\n        if key not in self.cache:\n            return None\n        \n        node = self.cache[key]\n        \n        # Check for TTL\n        if time.time() > node.expiry:\n            self._remove(node)\n            del self.cache[key]\n            return None\n        \n        # Move to head (updated)\n        self._remove(node)\n        self._add_to_head(node)\n        return node.value\n\n    def put(self, key: K, value: V):\n        \"\"\"Insert or update an item.\"\"\"\n        if key in self.cache:\n            self._remove(self.cache[key])\n        \n        expiry = time.time() + self.ttl\n        new_node = Node(key, value, expiry)\n        self.cache[key] = new_node\n        self._add_to_head(new_node)\n\n        if len(self.cache) > self.capacity:\n            # Evict least recent (before tail)\n            lru = self.tail.prev\n            if lru != self.head:\n                self._remove(lru)\n                del self.cache[lru.key]\n\n    def __len__(self) -> int:\n        \"\"\"Return current size of non-expired items (approx).\"\"\"\n        return len(self.cache)\n\n# Unit Tests\ndef test_lru_logic():\n    cache = LRUTTLCache(capacity=2, ttl=60)\n    cache.put(\"a\", 1)\n    cache.put(\"b\", 2)\n    assert cache.get(\"a\") == 1\n    cache.put(\"c\", 3)  # \"b\" should be evicted\n    assert cache.get(\"b\") is None\n    assert cache.get(\"a\") == 1\n    assert cache.get(\"c\") == 3\n    print(\"LRU logic passed.\")\n\ndef test_ttl_logic():\n    cache = LRUTTLCache(capacity=5, ttl=1)\n    cache.put(\"short\", \"lived\")\n    assert cache.get(\"short\") == \"lived\"\n    time.sleep(",
+      "tokens_per_forward": 18.285715103149414,
+      "case": "python_module",
+      "phase": "sweep"
+    },
+    {
+      "prompt_tokens": 63,
+      "completion_tokens": 1024,
+      "output_budget": 1024,
+      "max_denoising_steps": 48,
+      "seed": 42,
+      "thinking": true,
+      "terminated": false,
+      "prompt_setup_and_prefill_seconds": 0.07867239904589951,
+      "decode_seconds": 5.0818059029988945,
+      "generation_seconds": 5.160478302044794,
+      "decode_tokens_per_second": 201.50317024027095,
+      "generated_text": "<|channel>thought\n*   Goal: Derive the formula for the sum of squares $S_n = \\sum_{k=1}^n k^2$.\n    *   Method for derivation: Telescoping cubes (using $(k+1)^3 - k^3$).\n    *   Verification: Explicit for $n=1$ to $n=10$.\n    *   Proof: Mathematical induction.\n    *   Requirement: Show all intermediate algebra and checks.\n\n    *   To find $\\sum k^2$, start with the identity for $(k+1)^3$.\n    *   Expand $(k+1)^3$: $(k+1)^3 = k^3 + 3k^2 + 3k + 1$.\n    *   Rearrange to get the difference: $(k+1)^3 - k^3 = 3k^2 + 3k + 1$.\n    *   Sum both sides from $k=1$ to $n$: $\\sum_{k=1}^n ((k+1)^3 - k^3) = \\sum_{k=1}^n (3k^2 + 3k + 1)$.\n    *   The left side is a telescoping sum $(n+1)^3 - 1^3$.\n    *   The right side is $3\\sum k^2 + 3\\sum k + \\sum 1$.\n    *   Substitute known formulas: $\\sum k = \\frac{n(n+1)}{2}$ and $\\sum 1 = n$.\n    *   Solve for $\\sum k^2$:\n        *   $(n+1)^3 - 1 = 3S_n + 3\\frac{n(n+1)}{2} + n$.\n        *   $n^3 + 3n^2 + 3n + 1 - 1 = 3S_n + \\frac{3n^2 + 3n}{2} + n$.\n        *   $n^3 + 3n^2 + 3n = 3S_n + \\frac{3n^2 + 3n + 2n}{2}$.\n        *   Multiply by 2: $2n^3 + 6n^2 + 6n = 6S_n + 3n^2 + 5n$.\n        *   $6S_n = 2n^3 + 3n^2 + n$.\n        *   $S_n = \\frac{n(2n^2 + 3n + 1)}{6} = \\frac{n(n+1)(2n+1)}{6}$.\n\n    *   Formula: $S_n = \\frac{n(n+1)(2n+1)}{6}$.\n    *   Need a table for $n=1, \\dots,10$.\n    *   $n=1: 1^2 = 1$. Formula: $1(2)(3)/6 = 1$. (Check)\n    *   $n=2: 1^2+2^2 = 1+4=5$. Formula: $2(3)(5)/6 = 5$. (Check)\n    *   $n=3: 5+3^2=14$. Formula: $3(4)(7)/6 = 14$. (Check)\n    *   $n=4: 14+4^2=30$. Formula: $4(5)(9)/6 = 30$. (Check)\n    *   $n=5: 30+5^2=55$. Formula: $5(6)(11)/6 = 55$. (Check)\n    *   $n=6: 55+6^2=91$. Formula: $6(7)(13)/6 = 91$. (Check)\n    *   $n=7: 91+7^2=140$. Formula: $7(8)(15)/6 = 140$. (Check)\n    *   $n=8: 140+8^2=204$. Formula: $8(9)(17)/6 = 204$. (Check)\n    *   $n=9: 204+9^2=285$. Formula: $9(10)(19)/6 = 285$. (Check)\n    *   $n=10: 285+10^2=385$. Formula: $10(11)(21)/6 = 3",
+      "tokens_per_forward": 27.675676345825195,
+      "case": "mathematical_proof",
+      "phase": "sweep"
+    },
+    {
+      "prompt_tokens": 52,
+      "completion_tokens": 1024,
+      "output_budget": 1024,
+      "max_denoising_steps": 48,
+      "seed": 42,
+      "thinking": false,
+      "terminated": false,
+      "prompt_setup_and_prefill_seconds": 0.07476887106895447,
+      "decode_seconds": 8.25172062695492,
+      "generation_seconds": 8.326489498023875,
+      "decode_tokens_per_second": 124.09533069442756,
+      "generated_text": "<|channel>thought\n<channel|># The Architecture of Performance: A Deep Dive into Memory Hierarchy and Matrix Multiplication\n\nIn modern computing, the performance of an algorithm is rarely limited by the raw clock speed of the processor or the number of floating-point units. Instead, performance is dictated by how efficiently data is moved through the memory hierarchy. For computationally intensive tasks like matrix multiplication, the gap between processor speed and memory latency (the memory wall) is the primary bottleneck. \n\nThis article explores the technical nuances of CPU caches, cache coherence, and memory bandwidth, and how these concepts govern the efficiency of linear algebra operations.\n\n---\n\n## 1. The Memory Hierarchy and CPU Caches\n\nTo understand why matrix multiplication matters, one must first understand the \"Memory Wall.\" While CPU speeds have increased exponentially over the decades, the latency of Main Memory (DRAM) has not kept pace. To bridge this gap, computer architects use a hierarchical memory structure.\n\n### The Layers of Memory\n1.  **Registers:** Located inside the CPU core, providing zero-latency access but extremely limited capacity (bytes).\n2.  **L1 Cache:** Small (KB), usually split into instruction (L1i) and data (L1d) caches. It is fast (~1-4 cycles) and private to each core.\n3.  **L2 Cache:** Larger (KB to MB), usually private, but slightly slower (~10-20 cycles).\n4.  **L3 Cache (LLC):** Large (MB), shared across all cores. It acts as a buffer for the DRAM.\n5.  **DRAM (Main Memory):** Massive capacity (GB) but high latency (~200+ cycles).\n\n### Cache Lines and Prefetching\nThe CPU does not fetch single bytes from memory. Instead, it fetches a block known as a **Cache Line** (typically 64 bytes). When a program requests `A[i][j]`, the hardware loads the entire 64-byte chunk containing that element into the L1 cache. This mechanism is the foundation of spatial locality.\n\n---\n\n## 2. Locality of Reference: The Key to Cache Efficiency\n\nThe effectiveness of a cache relies on two principles of locality:\n\n### Temporal Locality\nIf a particular memory location is referenced, it is likely to be referenced again in the near future. In matrix multiplication, this occurs when we reuse a row of the first matrix or a column of the second matrix across multiple iterations.\n\n### Spatial Locality\nIf a memory location is referenced, locations with nearby addresses are likely to be referenced soon. This is why traversing a matrix in row-order (in languages like C/C++) is significantly faster than column-order traversal.\n\n---\n\n## 3. Memory Bandwidth vs. Latency\n\n**Bandwidth** is the rate at which data can be transferred from memory to the CPU (measured in GB/s). **Latency** is the time taken to fetch the first byte of data.\n\nIn a naive matrix multiplication ($C = A \\times B$), the computational complexity is $O(n^3)$ while the data complexity is $O(n^2)$. Theoretically, as $n$ grows, the operation should become compute-bound. However, if the data access pattern is poor, the CPU spends most cycles waiting for data, making it memory-bound.\n\n---\n\n## 4. Cache Coherence in Multi-core Systems\n\nIn modern multi-core processors, multiple caches may hold copies of the same memory block. If Core A modifies a value, Core B must be notified. This is managed by a **Cache Coherence Protocol**.\n\n### The MESI Protocol\nMost modern CPUs use a variation of the MESI (Modified, Exclusive, Shared, Invalid) protocol:\n*   **Modified:** The line is present only in the current cache and has been modified (dirty).\n*   **Exclusive:** The line is present only in the current cache but matches main memory.\n*   **Shared:** The line may be stored in other caches and matches main memory.\n*   **Invalid:** The line is invalid.\n\nIn parallelized matrix multiplication, cache coherence becomes critical. If multiple threads write to adjacent elements that reside on the same cache line (**False Sharing**), the hardware will constantly invalidate and reload the line across cores, destroying performance.\n\n---\n\n## 5. Matrix Multiplication: A Technical Case Study\n\nLet’s analyze how these concepts impact the standard operation of $C = A \\times B$.\n\n### The Naive Approach\nThe standard triple-nested loop implementation:\n```cpp\nfor (int i = 0; i < N; i++) {\n    for (int j = 0; j < N; j++) {\n        for (int k = 0; k < N; k++) {\n            C[i][j] += A[i][k] * B",
+      "tokens_per_forward": 17.65517234802246,
+      "case": "technical_essay",
+      "phase": "sweep"
+    },
+    {
+      "prompt_tokens": 55,
+      "completion_tokens": 1024,
+      "output_budget": 1024,
+      "max_denoising_steps": 16,
+      "seed": 42,
+      "thinking": false,
+      "terminated": false,
+      "prompt_setup_and_prefill_seconds": 0.07403393601998687,
+      "decode_seconds": 6.4808333539403975,
+      "generation_seconds": 6.554867289960384,
+      "decode_tokens_per_second": 158.0043713633525,
+      "generated_text": "<|channel>thought\n<channel|>```python\nimport time\nfrom typing import Any, Dict, Optional, TypeVar, Generic\n\nK = TypeVar(\"K\")\nV = TypeVar(\"V\")\n\nclass Node(Generic[K, V]):\n    \"\"\"A node in the doubly linked list.\"\"\"\n    def __init__(self, key: K, value: V, timestamp: float):\n        self.key = key\n        self.value = value\n        self.timestamp = timestamp\n        self.prev: Optional[\"Node[K, V]\"] = None\n        self.next: Optional[\"Node[K, V]\"] = None\n\nclass LRTTLCache(Generic[K, V]):\n    \"\"\"\n    A Least Recently Used (LRU) cache with Time-To-Live (TTL) support.\n    Uses a doubly linked list for O(1) ordering and a hash map for O(1) access.\n    \"\"\"\n    def __init__(self, capacity: int, ttl: float):\n        \"\"\"\n        :param capacity: Maximum number of items to hold in cache.\n        :param ttl: Time in seconds before an entry remains valid.\n        \"\"\"\n        self.capacity = capacity\n        self.ttl = ttl\n        self.cache: Dict[K, Node[K, V]] = {}\n        self.head = Node(None: Any, None: Any, 0.0)  # Dummy head\n        self.tail = Node(None: Any, None: Any, 0.0)  # Dummy tail\n        self.head.next = self.tail\n        self.tail.prev = self.head\n\n    def _remove(self, node: Node[K, V]):\n        \"\"\"Removes a node from the linked list.\"\"\"\n        p = node.prev\n        n = node.next\n        if p and n:\n            p.next = n\n            n.prev = p\n\n    def _add_front(self, node: Node[K, V]):\n        \"\"\"Adds a node to the head (most recently used).\"\"\"\n        n = self.head.next\n        node.prev = self.head\n        node.next = n\n        self.head.next = node\n        n.prev = node\n\n    def get(self, key: K) -> Optional[V]:\n        \"\"\"\n        Retrieve a value. Returns None if expired or missing.\n        \"\"\"\n        if key not in self.cache:\n            return None\n        \n        node = self.cache[key]\n        \n        # Check for expiration\n        if time.time() - node.timestamp > self.ttl:\n            self._remove(node)\n            del self.cache[key]\n            return None\n\n        # Move to front (LRU)\n        self._remove(node)\n        self._add_front(node)\n        return node.value\n\n    def put(self, key: K, value: V):\n        \"\"\"Inserts or updates a value.\"\"\"\n        if key in self.cache:\n            self._remove(self.cache[key])\n        \n        new_node = Node(key, value, time.time())\n        self.cache[key] = new_node\n        self._add_front(new_node)\n\n        if len(self.cache) > self.capacity:\n            # Remove least recently used (before tail)\n            lru = self.tail.prev\n            if lru != self.head:\n                self._remove(lru)\n                del self.cache[lru.key]\n\n    def size(self) -> int:\n        \"\"\"Returns current number of valid items in cache.\"\"\"\n        return len(self.cache)\n\n# --- Tests ---\nimport unittest\n\ndef test_lru_logic():\n    cache = LRTTLCache(capacity=2, ttl=100)\n    cache.put(\"a\", 1)\n    cache.put(\"b\", 2)\n    assert cache.get(\"a\") == 1\n    cache.put(\"c\", 3)  # \"b\" should be evicted\n    assert cache.get(\"b\") is None\n    assert cache.get(\"a\") == 1\n    assert cache.get(\"c\") == 3\n    print(\"LRU Logic passed.\")\n\ndef test_ttl_logic():\n    cache = LRTTLCache(capacity=2, ttl=0.1)\n    cache.put(\"short\", 1)\n    assert cache.get(\"short\") == 1\n    time.sleep(0.2)\n    assert cache.get(\"short\") is None\n    print(\"TTL",
+      "tokens_per_forward": 21.787233352661133,
+      "case": "python_module",
+      "phase": "sweep"
+    },
+    {
+      "prompt_tokens": 63,
+      "completion_tokens": 1024,
+      "output_budget": 1024,
+      "max_denoising_steps": 16,
+      "seed": 42,
+      "thinking": true,
+      "terminated": false,
+      "prompt_setup_and_prefill_seconds": 0.07797666394617409,
+      "decode_seconds": 4.683187494985759,
+      "generation_seconds": 4.761164158931933,
+      "decode_tokens_per_second": 218.6544957032761,
+      "generated_text": "<|channel>thought\n*   Goal: Derive the formula for the sum of squares $S_n = \\sum_{k=1}^n k^2$.\n    *   Method for derivation: Telescoping cubes (using $(k+1)^3 - k^3$).\n    *   Verification: Explicitly for $n=1$ to $10$.\n    *   Proof: Mathematical induction.\n    *   Requirement: Show all intermediate algebra and checks.\n\n    *   To get $\\sum k^2$, I should look at the expansion of the next higher power, i.e., $(k+1)^3$.\n    *   Identity: $(k+1)^3 = k^3 + 3k^2 + 3k + 1$.\n    *   Rearrange: $(k+1)^3 - k^3 = 3k^2 + 3k + 1$.\n    *   Sum both sides from $k=1$ to $n$:\n        $\\sum_{k=1}^n ((k+1)^3 - k^3) = \\sum_{k=1}^n (3k^2 + 3k + 1)$.\n    *   Left side is a telescoping sum: $(2^3 - 1^3) + (3^3 - 2^3) + \\dots + ((n+1)^3 - n^3) = (n+1)^3 - 1$.\n    *   Right side: $3\\sum k^2 + 3\\sum k + \\sum 1$.\n    *   Let $S_2 = \\sum k^2$, $S_1 = \\sum k = \\frac{n(n+1)}{2}$, and $\\sum 1 = n$.\n    *   Equate: $(n+1)^3 - 1 = 3S_2 + 3\\frac{n(n+1)}{2} + n$.\n    *   Solve for $S_2$:\n        $n^3 + 3n^2 + 3n + 1 - 1 = 3S_2 + \\frac{3n^2+3n}{2} + n$\n        $n^3 + 3n^2 + 3n = 3S_2 + \\frac{3n^2+3n+2n}{2}$\n        Multiply by 2: $2n^3 + 6n^2 + 6n = 6S_2 + 3n^2 + 5n$\n        $6S_2 = 2n^3 + 3n^2 + n$\n        $6S_2 = n(2n^2 + 3n + 1)$\n        $6S_2 = n(2n+1)(n+1)$\n        $S_2 = \\frac{n(n+1)(2n+1)}{6}$.\n\n    *   Formula: $f(n) = \\frac{n(n+1)(2n+1)}{6}$.\n    *   $n=1: 1^2 = 1$. $f(1) = \\frac{1(2)(3)}{6} = 1$. (Check)\n    *   $n=2: 1+4 = 5$. $f(2) = \\frac{2(3)(5)}{6} = 5$. (Check)\n    *   $n=3: 5+9 = 14$. $f(3) = \\frac{3(4)(7)}{6} = 14$. (Check)\n    *   $n=4: 14+16 = 30$. $f(4) = \\frac{4(5)(9)}{6} = 30$. (Check)\n    *   $n=5: 30+25 = 55$. $f(5) = \\frac{5(6)(11)}{6} = 55$. (Check)\n    *   $n=6: 55+36 = 91$. $f(6) = \\frac{6(7)(13)}{6} = 91$. (Check)\n    *   $n=7: 91+49 = 140$. $f(7) = \\frac{7(8)(15)}{6} = \\frac{840}{6} = 140$. (Check)\n    *   $n=8: 140+64 = 204$. $f(8) = \\frac{8(9",
+      "tokens_per_forward": 30.117647171020508,
+      "case": "mathematical_proof",
+      "phase": "sweep"
+    },
+    {
+      "prompt_tokens": 52,
+      "completion_tokens": 1024,
+      "output_budget": 1024,
+      "max_denoising_steps": 16,
+      "seed": 42,
+      "thinking": false,
+      "terminated": false,
+      "prompt_setup_and_prefill_seconds": 0.07603709795512259,
+      "decode_seconds": 7.597315446007997,
+      "generation_seconds": 7.673352543963119,
+      "decode_tokens_per_second": 134.7844521235537,
+      "generated_text": "<|channel>thought\n<channel|># The Architecture of Performance: A Deep Dive into Memory Hierarchy and Matrix Multiplication\n\nIn modern computing, the performance of a processor is rarely limited by its raw clock speed or the number of arithmetic units (ALUs). Instead, performance is defined by how effectively data can be moved to the execution units. For computationally intensive tasks like matrix multiplication—the backbone of deep learning and scientific simulation—understanding the relationship between the CPU and the memory hierarchy is critical.\n\nThis guide explores the mechanics of CPU caches, cache coherence, locality, and bandwidth, and how these concepts dictate the efficiency of linear algebra.\n\n---\n\n## 1. The Memory Hierarchy and CPU Caches\n\nThe \"Memory Wall\" refers to the increasing performance gap between the speed of CPUs and the latency of Main Memory (DRAM). While CPUs can perform operations in picoseconds, fetching data from DRAM can take hundreds of cycles. To bridge this, architects use a multi-level cache hierarchy.\n\n### The Cache Layers (L1, L2, L3)\n*   **L1 Cache (Level 1):** Integrated directly into the core. It is split into L1i (instructions) and L1d (data). It is the fastest (latency of ~4-5 cycles) but the smallest (usually 32KB–64KB per core).\n*   **L2 Cache (Level 2):** Usually private to each core, larger (256KB–1MB), with a latency of ~12-15 cycles.\n*   **L3 Cache (Level 3):** Shared across all cores in a socket. It acts as a pool to reduce expensive trips to DRAM. Latencies range from 40–60 cycles.\n\n### Cache Lines and Blocks\nData is not fetched from memory in single bytes. Instead, it moves in **Cache Lines** (typically 64 bytes). If you request a 4-byte integer, the CPU fetches the entire 64-byte block containing that integer into the cache. This mechanism is the foundation of spatial locality.\n\n---\n\n## 2. Locality of Reference: The Key to Efficiency\n\nEfficiency in software relies on two types of locality:\n\n1.  **Temporal Locality:** If a memory location is accessed, it is likely to be accessed again soon (e.g., a loop counter).\n2.  **Spatial Locality:** If a memory location is accessed, nearby locations are likely to be accessed soon (e.g., traversing an array sequentially).\n\nIn matrix multiplication ($C = A \\times B$), a naive implementation often fails at spatial locality for matrix $B$ because it accesses columns while the data is likely stored in rows (row-major order).\n\n---\n\n## 3. Memory Bandwidth vs. Compute Bound\n\n**Memory Bandwidth** is the maximum rate at which data can be transferred from memory to the CPU (measured in GB/s). **Latency** is the time delay before the first byte of data arrives.\n\nA matrix multiplication has a computational complexity of $O(n^3)$, while the data movement complexity is $O(n^2)$. This means that as matrices grow larger, the operation can become \"compute-bound\" if the data fits in the cache. However, for large matrices or poor algorithms, the CPU often becomes \"memory-bound,\" waiting for data.\n\n---\n\n## 4. Cache Coherence in Multi-core Systems\n\nIn modern multi-core processors, multiple caches may hold copies of the same memory block. If Core A modifies a value, Core B must be notified. This is **Cache Coherence**.\n\n### The MESI Protocol\nMost CPUs use the MESI protocol (Modified, Exclusive, Shared, Invalid):\n*   **Modified:** The line is present only in the current cache and has been modified.\n*   **Exclusive:** The line is present only in the current cache but matches main memory.\n*   **Shared:** The line may be stored in other caches.\n*   **Invalid:** The line is invalid/old.\n\nIn multi-threaded matrix multiplication, \"False Sharing\" occurs when two cores modify different variables that happen to reside on the same cache line. This forces the hardware to synchronize the cache across cores, severely degrading performance.\n\n---\n\n## 5. Matrix Multiplication: A Technical Analysis\n\nTo understand how these concepts converge, let's analyze the multiplication of two matrices $C = AB$.\n\n### A. The Naive Approach (O(n))\nThe standard triple-nested loop implementation:\n```cpp\nfor (int i = 0; i < n; i++) {\n    for (int j = 0; j < n; j++) {\n        for (int k = 0; k < n; k++) {\n            C[i][j] += A[i][k] * B[k][j];\n",
+      "tokens_per_forward": 19.320755004882812,
+      "case": "technical_essay",
+      "phase": "sweep"
+    },
+    {
+      "prompt_tokens": 55,
+      "completion_tokens": 1024,
+      "output_budget": 1024,
+      "max_denoising_steps": 8,
+      "seed": 42,
+      "thinking": false,
+      "terminated": false,
+      "prompt_setup_and_prefill_seconds": 0.07284904806874692,
+      "decode_seconds": 4.167871359968558,
+      "generation_seconds": 4.240720408037305,
+      "decode_tokens_per_second": 245.68896483593124,
+      "generated_text": "<|channel>thought\n<channel|>```python\nimport time\nfrom typing import Any, Dict, Optional, TypeVar, Generic, Tuple\n\nK = TypeVar(\"K\")\nV = TypeVar(\"V\")\n\nclass Node(Generic[K, V]):\n    \"\"\"A node in a doubly linked list.\"\"\"\n    def __init__(self, key: K, value: V, expiry: float):\n        self.key = key\n        self.value = value\n        self.expiry = expiry\n        self.prev: Optional['Node'] = None\n        self.next: Optional['Node'] = None\n\nclass LRUTTCache(Generic[K, V]):\n    \"\"\"\n    An LRU Cache with Time-To-Live (TTL) support.\n    Uses a doubly linked list for O(1) eviction and a \n    dictionary for O(1) lookups.\n    \"\"\"\n    def __init__(self, capacity: int, ttl_seconds: float):\n        \"\"\"\n        :param capacity: Maximum number of items in hold.\n        :param ttl_seconds: Time in an for seconds.\n        \"\"\"\n\nself.. = capacity\n\nselfself._ = =_seconds\n        self.cache: Dict[K, Node[K, V]] = {}\n        self.head = Node(None, None, None 0 0)  # Dummy head\n        self.tail = Node(None, None,  0.0)  # Dummy tail\n        self.head.next = self.tail\n        self.tail.prev = self.head\n\n    def _remove(self, node: Node[K, V]):\n        \"\"\"Remove a node from the linked list.\"\"\"\n        prev = node.prev\n        nxt = node.next\n        if prev:\n            prev. n = n\n\n\n\n.prev = prev\n\n    defdefadd((self node node: Node[K, V]):\n        \"\"\"Add a node to the head (mostmost).).\n                node =....\n\n         =.....\n\n        ........................ =self key key key,,,::::::\n\n\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"                \n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n        \n        \n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n",
+      "tokens_per_forward": 32.0,
+      "case": "python_module",
+      "phase": "sweep"
+    },
+    {
+      "prompt_tokens": 63,
+      "completion_tokens": 1024,
+      "output_budget": 1024,
+      "max_denoising_steps": 8,
+      "seed": 42,
+      "thinking": true,
+      "terminated": false,
+      "prompt_setup_and_prefill_seconds": 0.07913934101816267,
+      "decode_seconds": 4.38575919601135,
+      "generation_seconds": 4.464898537029512,
+      "decode_tokens_per_second": 233.482951123099,
+      "generated_text": "<|channel>thought\n*   Goal: Derive the formula for the sum of squares $S_n = \\sum_{k=1}^n k^2$.\n    *   Method for derivation: Telescoping cubes (using $(k+1)^3 - k^3$).\n    *   Verification: Explicit for $n=1$ to $n=10$.\n    *   Proof: Mathematical induction.\n    *   Requirement: Show all intermediate algebra and checks.\n\n    *   To find $\\sum k^2$, start with the identity for $(k+1)^3$.\n    *   Expand $(k+1)^3$: $(k+1)^3 = k^3 + 3k^2 + 3k + 1$.\n    *   Subtract $k^3$: $(k+1)^3 - k^3 = 3k^2 + 3k + 1$.\n    *   Sum both sides from $k=1$ to $n$:\n        $\\sum_{k=1}^n ((k+1)^3 - k^3) = \\sum_{k=1}^n (3k^2 + 3k + 1)$.\n    *   Left side is a telescoping sum: $(n+1)^3 - 1^3$.\n    *   Right side: $3\\sum k^2 + 3\\sum k + \\sum 1$.\n    *   Substitute known formulas for $\\sum k = \\frac{n(n+1)}{2}$ and $\\sum 1 = n$.\n    *   Let $S_n = \\sum k^2$.\n    *   $(n+1)^3 - 1 = 3S_n + 3\\frac{n(n+1)}{2} + n$.\n    *   Solve for $S_n$.\n    *   $3S_n = (n+1)^3 - 1 - \\frac{3n(n+1)}{2} - n$.\n    *   $3S_n = n^3 + 3n^2 + 3n + 1 - 1 - \\frac{3n^2+3n}{2} - n$.\n    *   $3S_n = n^3 + 3n^2 + 2n - \\frac{3n^2+3n}{2}$.\n    *   Multiply by 2: $6S_n = 2n^3 + 6n^2 + 4n - 3n^2 - 3n$.\n    *   $6S_n = 2n^3 + 3n^2 + n$.\n    *   Factor: $6S_n = n(2n^2 + 3n + 1) = n(n+1)(2n+1)$.\n    *   $S_n = \\frac{n(n+1)(2n+1)}{6}$.\n\n    *   Formula: $f(n) = \\frac{n(n+1)(2n+1)}{6}$.\n    *   $n=1: 1^2 = 1$. Formula: $\\frac{1(2)(3)}{6} = 1$. (Match)\n    *   $n=2: 1+4= 52 Formula  $\\frac{: $\\frac{2(3}5 6} ( )\n\n*)\n    *::  3+^^+3 24 14. Let's do this carefully.\n    *   $n=1: 1$\n    *   $n=2: 1+4=5$\n    *   $n=3: 5+9=14$\n    *   $n=4: 14+16=30$\n    *   $n=5: 30+25=55$\n    *   $n=6: 55+36=91$\n    *   $n=7: 91+49=140$\n    *   $n=8: 140+64=204$\n    *   $n=9: 204+81=285$\n    *   $n=10: 285+100=385$\n    *   Now check formula $\\frac{n(n+1)(2n+1)}{6}$ for each*   $n=1: 111111111                111",
+      "tokens_per_forward": 32.0,
+      "case": "mathematical_proof",
+      "phase": "sweep"
+    },
+    {
+      "prompt_tokens": 52,
+      "completion_tokens": 1024,
+      "output_budget": 1024,
+      "max_denoising_steps": 8,
+      "seed": 42,
+      "thinking": false,
+      "terminated": false,
+      "prompt_setup_and_prefill_seconds": 0.07614384300541133,
+      "decode_seconds": 4.419808574952185,
+      "generation_seconds": 4.4959524179575965,
+      "decode_tokens_per_second": 231.68424211925918,
+      "generated_text": "<|channel>thought\n<channel|># The Architecture of Performance: A Deep Dive into Memory Hierarchy and Matrix Multiplication\n\nIn modern computing, the performance of an algorithm is rarely limited by the raw arithmetic capability of the CPU. Instead, it is limited by how effectively data can be moved to the processing units. For computationally intensive tasks like matrix multiplication—the backbone of deep learning and scientific computing—understanding the interplay of memory architecture is critical.\n\nThis guide explores the technical interplay between CPU caches, cache coherence, locality, and memory bandwidth, and how these factors dictate the efficiency of matrix multiplication.\n\n---\n\n## 1. The Memory Hierarchy and CPU Caches\n\nTo understand matrix multiplication, one must first understand the \"Memory Wall.\" While CPU speeds have increased exponentially exponentially decades decades,, Memory Memory (DRAM) has not increased a much slower rate. To bridge this gap, hardware architects use a hierarchy of caches.\n\n### The Layers of L1, L2, and L3\nC   ** small, high-speed SRAM into into into into the core.\n*   **L1 Cache:** into into into into into into and and and It It is latency in ~1 nanoseconds.\n*   **L2 Cache:** Larger larger than L1, but, slower, usually ~3-10 nanoseconds.\n*   **L3 Cache (LLC):** Shared across all cores on a socket, acting as a buffer between L2 and DRAM.\n*   **DRAM (Main Memory):** Massive capacity, but high latency (~60-100 nanoseconds).\n\n### The Cache Line Concept\nThe CPU does not fetch single bytes from memory. Instead, it fetches a **Cache Line**, typically 64 bytes. If you access `A[0][0]`, the loads ` `A[ and and the surrounding bytes into the L1 cache. This is the foundation of **Spatial Locality**.\n\n---\n\n## 2. Locality: The Key to Efficiency\n\nLocality is the principle that programs tend to access a of of data data. It is categorized into two types:\n\n### Temporal Locality\nTemporal locality occurs that if a memory location is accessed, it is likely to be accessed again soon. In matrix multiplication ($C = B \\times B$),$), a a a of of of of matrix of matrix of matrix of multiple of of $ of Spatial Spatial Spatial Spatial Loc Loc Spatial Spatial Spatial Spatial Spatial Spatial Spatial Spatial is is is is is is is is is is to be be accessed again soon.\n\n### Spatial Locality\nSpatial locality occurs that if a a memory location is accessed, nearby memory locations are likely to be accessed soon. This is is is is is is is is is is is is is is is is is is to be to to to to is is is is to to to is likely to be be to be accessed soon be. soon.\n\n\n\n 3. Memory Memorywidth vs. Latency\n\nency\n\n******** the the to to to vs...\n************** the data the the the the the the the the the the the the the** the********** the the is is the data the is the the the is the is is is is is is is is is is is is is is is is is is is is is is is is is is the is is is is is is is is is the is the the is is is is is the is is is is the the is is the.\n\n is.\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n.\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n..\n\n. \\ \\ \\ \\ \\ \\ \\ \\ \\ \\ \\ \\ \\ \\ \\ \\ \\ \\ \\ \\ \\ \\ \\ \\ \\ \\ \\ \\ \\ \\ \\ \\ \\ \\ \\ \\ \\ \\ \\ \\ \\ \\ \\ \\ \\ \\ \\ \\ \\ \\ \\ \\ \\ \\ \\ \\ \\ \\ \\ \\ \\ \\ \\ \\ \\ \\ \\ \\ \\ \\ \\ \\ \\ \\ \\ \\ \\ \\ \\ \\ \\ \\ \\ \\ \\ \\ \\ \\ \\ \\ \\ \\ \\ \\ \\ \\ \\ \\ \\ \\ \\ \\ \\ \\ \\ \\ \\ \\ \\ \\ \\ \\ \\ \\ \\ \\ \\ \\ \\ \\ \\ \\ \\ \\ \\ \\ \\ \\ \\ \\ \\ \\ \\ \\ \\ \\ \\ \\ \\ \\ \\ \\ \\ \\ \\ \\ \\ \\ \\ \\ \\ \\ \\ \\ \\ \\ \\ \\ \\ \\ \\ \\ \\ \\ \\ \\ \\ \\ \\ \\ \\ \\ \\ \\ \\ \\ \\ \\ \\ \\ \\ \\ \\ \\ \\ \\ \\ \\ \\ \\ \\ \\ \\ \\ \\ \\ \\ \\ \\ \\ \\A \\ \\ \\ \\ \\ \\ \\ \\ \\ \\ \\ \\ \\ \\ \\ \\ \\ \\ \\ \\ \\ \\ \\ \\ \\ \\ \\ \\ \\ \\ \\ \\ \\ \\ \\ \\ \\ \\ \\ \\ \\ \\ \\ \\ \\ \\ \\ \\ \\ \\ \\ \\ \\ \\ \\ \\ \\",
+      "tokens_per_forward": 32.0,
+      "case": "technical_essay",
+      "phase": "sweep"
+    },
+    {
+      "prompt_tokens": 63,
+      "completion_tokens": 1024,
+      "output_budget": 1024,
+      "max_denoising_steps": 48,
+      "seed": 43,
+      "thinking": true,
+      "terminated": false,
+      "prompt_setup_and_prefill_seconds": 0.08143845899030566,
+      "decode_seconds": 4.896295871003531,
+      "generation_seconds": 4.977734329993837,
+      "decode_tokens_per_second": 209.13768836239134,
+      "generated_text": "<|channel>thought\n\n*   Goal: Derive the formula for $S_n = \\sum_{k=1}^n k^2$.\n    *   Method for derivation: Telescoping cubes (using $(k+1)^4 - k^4$).\n    *   Verification: Explicit check for $n=1$ to $n=10$.\n    *   Proof: Mathematical induction.\n    *   Requirement: Show all intermediate algebra and checks.\n\n    *   To find $\\sum k^2$, we start with the identity for $(k+1)^4$.\n    *   Expansion: $(k+1)^4 = k^4 + 4k^3 + 6k^2 + 4k + 1$.\n    *   Rearrange: $(k+1)^4 - k^4 = 4k^3 + 6k^2 + 4k + 1$.\n    *   Summing both sides from $k=1$ to $n$:\n        $\\sum_{k=1}^n ((k+1)^4 - k^4) = \\sum_{k=1}^n (4k^3 + 6k^2 + 4k + 1)$.\n    *   The left side is telescoping: $(n+1)^4 - 1^4$.\n    *   The right side: $4\\sum k^3 + 6\\sum k^2 + 4\\sum k + \\sum 1$.\n    *   Known formulas needed:\n        *   $\\sum k = \\frac{n(n+1)}{2}$\n        *   $\\sum k^3 = \\frac{n^2(n+1)^2}{4}$\n        *   $\\sum 1 = n$\n    *   Let $S_2 = \\sum k^2$.\n    *   Substitute: $(n+1)^4 - 1 = 4[\\frac{n^2(n+1)^2}{4}] + 6S_2 + 4[\\frac{n(n+1)}{2}] + n$.\n    *   Simplify and solve for $S_2$:\n        $(n+1)^4 - 1 = n^2(n+1)^2 + 6S_2 + 2n(n+1) + n$.\n        $n^4 + 4n^3 + 6n^2 + 4n + 1 - 1 = n^2(n^2+2n+1) + 6S_2 + 2n^2 + 2n + n$.\n        $n^4 + 4n^3 + 6n^2 + 4n = n^4 + 2n^3 + n^2 + 6S_2 + 2n^2 + 3n$.\n        $n^4 + 4n^3 + 6n^2 + 4n = n^4 + 2n^3 + 3n^2 + 3n + 6S_2$.\n        $2n^3 + 3n^2 + n = 6S_2$.\n        $6S_2 = n(2n^2 + 3n + 1) = n(2n+1)(n+1)$.\n        $S_2 = \\frac{n(n+1)(2n+1)}{6}$.\n\n    *   Formula: $S_n = \\frac{n(n+1)(2n+1)}{6}$.\n    *   $n=1: 1^2 = 1$; $1(2)(3)/6 = 1$. (Check)\n    *   $n=2: 1^2+2^2 = 5$; $2(3)(5)/6 = 5$. (Check)\n    *   $n=3: 5+9=14$; $3(4)(7)/6 = 14$. (Check)\n    *   $n=4: 14+16=30$; $4(5)(9)/6 = 30$. (Check)\n    *   $n=5: 30+25=55$; $5(6)(11)/6 = 55$. (Check)\n    *   $n=6: 55+36=91$; $6(7)(13)/6 = 91$. (Check)\n    *   $n=7: 91+49=140$; $7(8)(15)/6 = 140$. (Check)\n    *",
+      "tokens_per_forward": 28.44444465637207,
+      "case": "mathematical_proof",
+      "phase": "repeat"
+    },
+    {
+      "prompt_tokens": 63,
+      "completion_tokens": 1024,
+      "output_budget": 1024,
+      "max_denoising_steps": 48,
+      "seed": 44,
+      "thinking": true,
+      "terminated": false,
+      "prompt_setup_and_prefill_seconds": 0.07956027099862695,
+      "decode_seconds": 4.459835016052239,
+      "generation_seconds": 4.539395287050866,
+      "decode_tokens_per_second": 229.6049060815764,
+      "generated_text": "<|channel>thought\n*   Goal: Derive the formula for the sum of squares $S_2 = \\sum_{k=1}^n k^2$.\n    *   Method for derivation: Telescoping cubes (using $(k+1)^3 - k^3$).\n    *   Method for verification: Explicit check for $n=1$ to $n=10$.\n    *   Method for proof: Mathematical induction.\n    *   Constraint/Requirement: Show all intermediate algebra and checks.\n\n    *   To find $\\sum k^2$, we start with the identity for $(k+1)^3 - k^3$.\n    *   $(k+1)^3 = k^3 + 3k^2 + 3k + 1$.\n    *   Subtracting $k^3$ from both sides gives: $(k+1)^3 - k^3 = 3k^2 + 3k + 1$.\n    *   To use telescoping, we sum both sides from $k=1$ to $n$:\n        $\\sum_{k=1}^n ((k+1)^3 - k^3) = \\sum_{k=1}^n (3k^2 + 3k + 1)$.\n    *   The left side is a telescoping sum: $(2^3-1^3) + (3^3-2^3) + \\dots + ((n+1)^3-n^3) = (n+1)^3 - 1$.\n    *   The right side is: $3\\sum_{k=1}^n k^2 + 3\\sum_{k=1}^n k + \\sum_{k=1}^n 1$.\n    *   We know $\\sum_{k=1}^n k = \\frac{n(n+1)}{2}$ and $\\sum_{k=1}^n 1 = n$.\n    *   Let $S_2 = \\sum_{k=1}^n k^2$.\n    *   Equation: $(n+1)^3 - 1 = 3S_2 + 3\\frac{n(n+1)}{2} + n$.\n    *   Expand $(n+1)^3 - 1$: $n^3 + 3n^2 + 3n + 1 - 1 = n^3 + 3n^2 + 3n$.\n    *   Rearrange for $3S_2$:\n        $3S_2 = n^3 + 3n^2 + 3n - \\frac{3n^2+3n}{2} - n$.\n        Multiply by 2 to clear fractions:\n        $6S_2 = 2n^3 + 6n^2 + 6n - 3n^2 - 3n - 2n$.\n        $6S_2 = 2n^3 + 3n^2 + n$.\n        Factor out $n$:\n        $6S_2 = n(2n^2 + 3n + 1)$.\n        Factor the quadratic: $2n^2 + 3n + 1 = (2n+1)(n+1)$.\n        So, $6S_2 = n(n+1)(2n+1)$.\n        $S_2 = \\frac{n(n+1)(2n+1)}{6}$.\n\n    *   Formula: $f(n) = \\frac{n(n+1)(2n+1)}{6}$.\n    *   $n=1: 1^2 = 1$. $f(1) = \\frac{1(2)(3)}{6} = 1$. (Check)\n    *   $n=2: 1+4=5$. $f(2) = \\frac{2(3)(5)}{6} = 5$. (Check)\n    *   $n=3: 5+9=14$. $f(3) = \\frac{3(4)(7)}{6} = 14$. (Check)\n    *   $n=4: 14+16=30$. $f(4) = \\frac{4(5)(9)}{6} = 30$. (Check)\n    *   $n=5: 30+25=55$. $f(5) = \\frac{5(6)(11)}{6} = 55$. (Check)\n    *   $n=6: 55+36=91$. $f(6) = \\frac{6(7)(13)}{6}",
+      "tokens_per_forward": 32.0,
+      "case": "mathematical_proof",
+      "phase": "repeat"
+    },
+    {
+      "prompt_tokens": 55,
+      "completion_tokens": 1024,
+      "output_budget": 1024,
+      "max_denoising_steps": 8,
+      "seed": 43,
+      "thinking": false,
+      "terminated": false,
+      "prompt_setup_and_prefill_seconds": 0.07410228194203228,
+      "decode_seconds": 4.158191850059666,
+      "generation_seconds": 4.232294132001698,
+      "decode_tokens_per_second": 246.26088379864115,
+      "generated_text": "<|channel>thought\n<channel|>```python\nimport time\nimport unittest\nfrom typing import Any, Dict, Optional, Type, Type\n\n\nclass Node:\n    \"\"\"A node for a doubly linked list.\"\"\"\n    def __init__(self, key: Any, value: Any, expiry: float):\n        self.key = key\n        self.value = value\n        self.expiry = expiry\n        self.prev: Optional['Node'] = None\n        self.next: Optional['Node'] = None\n\n\nclass LRTTLCache:\n    \"\"\"\n    An LRU Cache with TTL (Time-To-Live) support.\n    Uses a doubly linked list for O(1) eviction and a dictionary for O(1) lookups.\n    \"\"\"\n    def __init__(self, capacity: int, ttl: Optional[int] = None):\n        \"\"\"\n        :param capacity: Maximum number of items in cache.\n        :param ttl: Time in seconds for items. If None items never expire.\n\n\"\"\"\n        selfselfcapacity = capacity\n        selfselfttl = ttl\n\nselfself.: Dict[Any, Node]] = {}\nselfself.:: Optional[Node = = None\n        self.head: Optional[Node] = None\n        self.tail: Optional[Node] = None\n\n    def _remove(self, node: Node) -> None:\n        if node.prev:\n            node.prev.next = node.next\n        else:\n            self.head = node.next\n        if node.next:\n            node.next.prev = node.prev\n        else:\n            self.tail = node.prev\n\n    def _add_head(self, node: Node) -> None:\n        node.next = self.head\n        node.prev = None\n        if self.head:\n            self.head.prev = node\n        self.head = node\n        if not self.tail:\n            self.tail = node\n\n    def put(self, key: Any, value: Any) -> None:\n        \"\"\"Inserts or updates an value.\n                 = time time.time\n        ttl = =..ttl +...ttlttlttlttlttlttlttl                        ...\n\n\n\n\n.selfself.\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n",
+      "tokens_per_forward": 32.0,
+      "case": "python_module",
+      "phase": "repeat"
+    },
+    {
+      "prompt_tokens": 55,
+      "completion_tokens": 1024,
+      "output_budget": 1024,
+      "max_denoising_steps": 8,
+      "seed": 44,
+      "thinking": false,
+      "terminated": false,
+      "prompt_setup_and_prefill_seconds": 0.07218418992124498,
+      "decode_seconds": 4.469755855971016,
+      "generation_seconds": 4.541940045892261,
+      "decode_tokens_per_second": 229.09528685600768,
+      "generated_text": "<|channel>thought\n<channel|>```python\nimport time\nimport unittest\nfrom typing import Any, Dict, Optional, TypeVar, Generic\n\nK = TypeVar(\"K\")\n\nclass Node(Generic[K]):\n    \"\"\"A node in the doubly linked list.\"\"\"\n    def __init__(self, key: K, value: Any, expiry: float):\n        self.key = key\n        self.value = value\n        self.expiry = expiry\n        self.prev: Optional[Node[K]] = None\n        self.next: Optional[Node[K]] = None\n\nclass LRUCache(Generic[K]):\n    \"\"\"\n    An LRU Cache with Time (To-ToTTL) support.\n    Uses a doubly linked list for O(1) operations and a dictionary for O(1) lookups.\n    \"\"\"\n    def __init__(self, capacity: int, ttl: float):\n        \"\"\"\n        :param capacity: Maximum number of items allowed in the cache.\n        :param ttl: Time in seconds for entry validity.\n        \"\"\"\n        self.capacity = capacity\n        self.ttl = ttl\n        self.cache: Dict[K, Node[K]] = {}\n        self.head: Optional[Node[K]] = None  # Most recent\n        self.tail: Optional[Node[K]] = None  # Least recent\n\n    def _remove(self, node: Node[K]):\n        \"\"\"Removes a node from the doubly linked list.\"\"\"\n        if node.prev:\n            node.prev.next = node.next\n        else:\n            self.head = node.next\n        \n        if node.next:\n            node.next.prev = node.prev\n        else:\n            self.tail = node.prev\n\n    def _add_head(self, node: Node[K]):\n        \"\"\"Adds a node to the head of the doubly linked list.\"\"\"\n        node.next = self.head\n        node.prev = None\n        if self.head:\n            self.head.prev = node\n        self.head = node\n        if not self.tail:\n            self.tail = node\n\n    def put(self, key: K, value: Any) -> None:\n        \"\"\"Inserts or updates an item in the cache.\"\"\"\n        expiry = time.time() + self.ttl\n        if key in self.cache:\n            node = self.cache[key]\n            node.value = value\n            node.expiry = expiry\n            self._remove(node)\n            self._add_head(node)\n        else:\n            new_node = Node(key, value, expiry)\n            if len(self.cache) >= self.capacity:\n                self._evict()\n            self.cache[key] = new_node\n            self._add_head(new_node)\n\n    def get(self, key: K) -> Optional[Any]:\n        \"\"\"Retrieves an item. Returns None if expired or not found.\"\"\"\n        if key not in self.cache:\n            return None\n        \n        node = self.cache[key]\n        \n        # Check for TTL\n        if time.time() > node.expiry:\n            self._remove(node)\n            del self.cache[key]\n            return None\n        \n        # Move to head (LRU logic)\n        self._remove(node)\n        self._add_head(node)\n        return node.value\n\n    def _evict(self) -> None:\n        \"\"\"Evicts the least recently used item.\"\"\"\n        if not self.tail:\n            return\n        old_tail = self.tail\n        self._remove(old_tail)\n        del self.cache[old_tail.key]\n\n    def __len__(self) -> int:\n        \"\"\"Returns current count of valid items in cache.\"\"\"\n        return len(self.cache)\n\n\nclass TestLRUCache(unittest.TestCase):\n    def test_basic_lru(self):\n        cache = LRUCache(capacity=2, ttl=10)\n        cache.put(\"a\", 1)\n        cache.put(\"b\", 2)\n        self.assertEqual(cache.get(\"a\"), 1)\n        cache.put(\"c\", 3)\n\n        .assertassertNone(cache.get(\"b\"))\n\nself.assertEqual(cache.get(\"b\"), 2)\n        self.assertEqual(cache.get(\"c\"), 3)\n\n    def test_ttl(self):\n        cache = LRUCache(capacity=2, ttl=0.1)\n        cache.",
+      "tokens_per_forward": 32.0,
+      "case": "python_module",
+      "phase": "repeat"
+    }
+  ],
+  "configuration": {
+    "canvas_length": 256,
+    "native_max_denoising_steps": 48,
+    "entropy_bound": 0.1,
+    "t_min": 0.4,
+    "t_max": 0.8,
+    "stability_threshold": 1,
+    "confidence_threshold": 0.005
+  },
+  "runtime": {
+    "python": "3.12.3",
+    "torch": "2.11.0+cu130",
+    "transformers": "5.12.1",
+    "triton": "3.6.0",
+    "cuda": "13.0",
+    "gpu": "NVIDIA GB10"
+  },
+  "phase": "complete",
+  "winner_groups": [
+    {
+      "case": "mathematical_proof",
+      "max_denoising_steps": 48,
+      "samples": 3,
+      "median_tokens_per_second": 209.13768836239134,
+      "peak_tokens_per_second": 229.6049060815764,
+      "aggregate_tokens_per_second": 212.7727835819379
+    },
+    {
+      "case": "python_module",
+      "max_denoising_steps": 8,
+      "samples": 3,
+      "median_tokens_per_second": 245.68896483593124,
+      "peak_tokens_per_second": 246.26088379864115,
+      "aggregate_tokens_per_second": 240.07841812665583
+    }
+  ],
+  "cuda_peak_allocated_bytes": 19506853376,
+  "standalone_runner_smoke": {
+    "message": {
+      "role": "assistant",
+      "content": "動作確認できました",
+      "reasoning_content": ""
+    },
+    "finish_reason": "stop",
+    "usage": {
+      "prompt_tokens": 22,
+      "completion_tokens": 8,
+      "total_tokens": 30
+    },
+    "timings": {
+      "generation_seconds": 1.8078710199333727,
+      "first_finalized_canvas_seconds": 1.8075451439945027,
+      "delivery": "buffered"
+    },
+    "wall_seconds": 1.9263037350028753,
+    "output_tokens_per_second": 4.1530314532604375
+  },
+  "execution": {
+    "format": "dg-w4a16-e38-overlay-v1",
+    "base": {
+      "model_id": "GoedelMachines/diffusiongemma-26B-A4B-w4a16",
+      "revision": "0fede6e3e65d258d444822cfb6a79092cdc5c0af"
+    },
+    "source": {
+      "model_id": "Goodoldjam/DiffusionGemma-26B-E38-Abliterated-NVFP4",
+      "revision": "3f007177bf67706bd335f8275a1bd2657cd4e686"
+    },
+    "overlay_sha256": "7a913d9bdb580fe06c42efc0833d3eab9ec7d2d255144e9d7b102458e124fec7",
+    "modified_dense_tensors": 20,
+    "execution": "Goedel fast W4A16 turbo with dense BF16 E38 overlay",
+    "expert_requantization": false
+  },
+  "date": "2026-10-19",
+  "manual_output_review": {
+    "inspected_samples": [
+      {
+        "case": "mathematical_proof",
+        "max_denoising_steps": 48,
+        "seed": 44
+      },
+      {
+        "case": "python_module",
+        "max_denoising_steps": 8,
+        "seed": 42
+      },
+      {
+        "case": "python_module",
+        "max_denoising_steps": 8,
+        "seed": 43
+      }
+    ],
+    "finding": "The inspected 8-step Python samples contain syntax corruption and long repeated-newline runs. Their token rates are raw throughput, not useful-code throughput. The inspected standard-step proof remains coherent but is cut off at the 1024-token benchmark budget.",
+    "quality_benchmark_performed": false
+  },
+  "budget_note": "All measured samples reached the 1024-token output budget without EOS; rates describe bounded generation, not completed answers."
+}
