@@ -1,0 +1,207 @@
+{
+  "shared_dense_tensors": 987,
+  "base_only_tensors": [],
+  "source_only_tensors": [],
+  "changed": [
+    {
+      "name": "model.decoder.layers.10.mlp.down_proj.weight",
+      "dtype": "BF16",
+      "shape": [
+        2816,
+        2112
+      ],
+      "sha256": "c5666613cc744736b2a9b781c0f731d2f2627d6938e40f7ccfc1692c326d817b",
+      "base_sha256": "ff978b318e2e0318f61db8c3a92d5f5a7f843a0804d7f04c5c91862e918d6a41"
+    },
+    {
+      "name": "model.decoder.layers.10.self_attn.o_proj.weight",
+      "dtype": "BF16",
+      "shape": [
+        2816,
+        4096
+      ],
+      "sha256": "3540c9dc4a94bb0b5a4279e86f0bb136b4f395bd3432c7bfac11b81a7405cb1a",
+      "base_sha256": "38fe4ee8e93a864d0096b34894f743cc962290d7aa05750f942458cebc827608"
+    },
+    {
+      "name": "model.decoder.layers.11.mlp.down_proj.weight",
+      "dtype": "BF16",
+      "shape": [
+        2816,
+        2112
+      ],
+      "sha256": "45084b1d4ede2f2d37c8cac55a3d9245e6d01de265b068976f99c339e181393a",
+      "base_sha256": "7a0094241fe3b77efaa4d64877c051b4355e1de13d43ccc0ac4ae019cfc743a8"
+    },
+    {
+      "name": "model.decoder.layers.11.self_attn.o_proj.weight",
+      "dtype": "BF16",
+      "shape": [
+        2816,
+        8192
+      ],
+      "sha256": "c15e034e192b9d059054fa27cdc9c1197f4a3c01da3f6fc5b6931405f33960d5",
+      "base_sha256": "0a4413d876a12fc6ac9d90f8663305c8831200d4909f154b6885ce233cd02311"
+    },
+    {
+      "name": "model.decoder.layers.12.mlp.down_proj.weight",
+      "dtype": "BF16",
+      "shape": [
+        2816,
+        2112
+      ],
+      "sha256": "7ff9068a6dad3f3646050842283706636f8564b3e507ef8304525f3cbc81c429",
+      "base_sha256": "30a4ad76b5c231f331e7b0de9302f72a3fdda231b3a815719b6ba7d893e97f20"
+    },
+    {
+      "name": "model.decoder.layers.12.self_attn.o_proj.weight",
+      "dtype": "BF16",
+      "shape": [
+        2816,
+        4096
+      ],
+      "sha256": "353790a0bdf43b4605b18572677108b0a2e20769b521eb6f036512f715bc4ac6",
+      "base_sha256": "e489db43ffc8cac04e916fd07710314a9a8c231531f43ff57f57806d0182bc5b"
+    },
+    {
+      "name": "model.decoder.layers.13.mlp.down_proj.weight",
+      "dtype": "BF16",
+      "shape": [
+        2816,
+        2112
+      ],
+      "sha256": "140bd31658da265d670754470bba3b4d0770c66dd9fd7b514bf740da523b5281",
+      "base_sha256": "8694ce905bfb8c87460c6ca579aed9c38348695a4d54f9b4948a666b51f00eec"
+    },
+    {
+      "name": "model.decoder.layers.13.self_attn.o_proj.weight",
+      "dtype": "BF16",
+      "shape": [
+        2816,
+        4096
+      ],
+      "sha256": "770dae8f332fdfab07a506b568f369e56d859443ca6c2fb04ff0144448aa9629",
+      "base_sha256": "bd4b3494177b55a0ccf3c29c673db8418c3a09ffb4b9fe74d3c7504c74efcd17"
+    },
+    {
+      "name": "model.decoder.layers.14.mlp.down_proj.weight",
+      "dtype": "BF16",
+      "shape": [
+        2816,
+        2112
+      ],
+      "sha256": "1dfd318a915cb298e58d9aff6442809bf750ec67b1df01977e24b2e8a1008fb6",
+      "base_sha256": "20145e1186be3bcdf2a00bc2820bf8ac44291320dbffe128c22e1ec235b6d53a"
+    },
+    {
+      "name": "model.decoder.layers.14.self_attn.o_proj.weight",
+      "dtype": "BF16",
+      "shape": [
+        2816,
+        4096
+      ],
+      "sha256": "2f7ea656b3365a320028185c2220fdb17600f7499e0cd5d5d202744fb1b229b5",
+      "base_sha256": "40da3c7ca198a340616cc19bbc47ff6e73ab81ef76f435fb3f13205987145737"
+    },
+    {
+      "name": "model.decoder.layers.15.mlp.down_proj.weight",
+      "dtype": "BF16",
+      "shape": [
+        2816,
+        2112
+      ],
+      "sha256": "d8043876571829baf038772dfddd3d2c04caa8e54e5c308b6b8358785cc4c38b",
+      "base_sha256": "e215c7463530bbac1c074ecc2a7089e3ba303b7b99d66b6395bdcbb717405b48"
+    },
+    {
+      "name": "model.decoder.layers.15.self_attn.o_proj.weight",
+      "dtype": "BF16",
+      "shape": [
+        2816,
+        4096
+      ],
+      "sha256": "032ccdb750a04b38caec511b6cfce87328107bafe80d9f29fbc0958853621ce9",
+      "base_sha256": "1a4f97235a71d47488d1fef6bccb7075b8268d1f5b9e96bad466df9b696a1b6d"
+    },
+    {
+      "name": "model.decoder.layers.16.mlp.down_proj.weight",
+      "dtype": "BF16",
+      "shape": [
+        2816,
+        2112
+      ],
+      "sha256": "6403b7bcaa0b07faab50f00b7601dd08ca66a3bebb5cc7bbcdb5233181385ccf",
+      "base_sha256": "36ba923793bf07e9e6b03c4766fb5d6be29d453a24b18b813d85d8e50f4f7b55"
+    },
+    {
+      "name": "model.decoder.layers.16.self_attn.o_proj.weight",
+      "dtype": "BF16",
+      "shape": [
+        2816,
+        4096
+      ],
+      "sha256": "5015d31c7b132209638b1925d78adc12089d09ea2b747ebb93af4aa4f4904f23",
+      "base_sha256": "40e6feacdf67a1e1c02784be982793adebf619e66f697edc42f34ee1100a8a09"
+    },
+    {
+      "name": "model.decoder.layers.7.mlp.down_proj.weight",
+      "dtype": "BF16",
+      "shape": [
+        2816,
+        2112
+      ],
+      "sha256": "69fed3b850e832f961011ee84252ed90195a653c341614bfc64de71164ccc17a",
+      "base_sha256": "c0459d27a2675645d1977cbccc3cb5d233d7cf30bb6fcf59afa26ee213638aa5"
+    },
+    {
+      "name": "model.decoder.layers.7.self_attn.o_proj.weight",
+      "dtype": "BF16",
+      "shape": [
+        2816,
+        4096
+      ],
+      "sha256": "a7f23d28eaf9b1f23916acfa31889dd9c09a7995c97be84a4765ccfc242060d8",
+      "base_sha256": "5077b5d2d856ebf640236a2cce3656d3ec5582aa97777976c755c8ab2b839f43"
+    },
+    {
+      "name": "model.decoder.layers.8.mlp.down_proj.weight",
+      "dtype": "BF16",
+      "shape": [
+        2816,
+        2112
+      ],
+      "sha256": "42365c0945e3055e22684b08387259a78ae584157a08d98f2cd663a1c2b6f894",
+      "base_sha256": "2fde4296e4699468aca8d6d513e923a5f45125df72f8f8af1bc564b4061c9659"
+    },
+    {
+      "name": "model.decoder.layers.8.self_attn.o_proj.weight",
+      "dtype": "BF16",
+      "shape": [
+        2816,
+        4096
+      ],
+      "sha256": "deb7efe98ea701df46bbd285d48827c0d4ce92ef2941ab86f7f33876dfb3ce5a",
+      "base_sha256": "1c0e723750c11ff8a28559c1c5da7df8b739594f89cf15e93ac92bd763c67aab"
+    },
+    {
+      "name": "model.decoder.layers.9.mlp.down_proj.weight",
+      "dtype": "BF16",
+      "shape": [
+        2816,
+        2112
+      ],
+      "sha256": "41b1b374cf77b672d5f67833779678c500c21696d4ca6e122f11b026ce4b91c1",
+      "base_sha256": "479a70deeb4ade0bb876ba2fd0391d3d8a0868c77fa3735d4a42f2968f4d0f82"
+    },
+    {
+      "name": "model.decoder.layers.9.self_attn.o_proj.weight",
+      "dtype": "BF16",
+      "shape": [
+        2816,
+        4096
+      ],
+      "sha256": "2f3415d433a90dce089f3eb78fba2dfc40ba10d67bf3269f84e435b9187f589b",
+      "base_sha256": "80279da59e23c0a3a21bf6c54706feb449e408df3682d82339dae99a526ef028"
+    }
+  ]
+}

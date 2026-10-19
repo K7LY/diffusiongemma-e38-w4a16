@@ -1,0 +1,14 @@
+DiffusionGemma E38 W4A16
+
+This project provides an overlay-building recipe, validation and a local runner.
+Project source code is distributed under the Apache License, Version 2.0.
+
+Acknowledgments:
+- Google DeepMind: original DiffusionGemma model and architecture.
+- Goedel Machines: W4A16 checkpoint and fast execution implementation.
+- Goodoldjam: E38 ablation checkpoint used as the overlay source.
+
+External model weights, overlay binaries and Goedel implementation files are not
+included in this source distribution. Their respective upstream rights and
+notices remain separate from this project's license. See THIRD_PARTY_NOTICES.md
+and docs/licensing.md for source links and distribution scope.

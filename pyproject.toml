@@ -1,0 +1,37 @@
+[build-system]
+requires = ["setuptools>=77"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "diffusiongemma-e38-w4a16"
+version = "0.1.0"
+description = "Reproducible E38 overlays for fast DiffusionGemma W4A16 inference on GB10"
+readme = "README.md"
+requires-python = ">=3.12"
+license = "Apache-2.0"
+license-files = ["LICENSE", "NOTICE", "THIRD_PARTY_NOTICES.md"]
+authors = [{name = "K7LY"}]
+
+[project.urls]
+Repository = "https://github.com/K7LY/diffusiongemma-e38-w4a16"
+
+[project.optional-dependencies]
+download = ["huggingface-hub==1.33.0"]
+inference = [
+  "torch==2.11.0",
+  "transformers==5.12.1",
+  "triton==3.6.0; platform_system == 'Linux'",
+  "accelerate==1.15.0",
+  "safetensors==0.8.0",
+  "huggingface-hub==1.33.0",
+  "numpy==2.5.4",
+]
+
+[project.scripts]
+e38-w4a16 = "e38_w4a16.cli:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.setuptools.package-data]
+e38_w4a16 = ["data/*.json"]

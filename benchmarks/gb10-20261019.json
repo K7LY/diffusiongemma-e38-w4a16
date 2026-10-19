@@ -1,0 +1,254 @@
+{
+  "schema_version": 1,
+  "date": "2026-10-19",
+  "measurement_boundary": "Original application API: prompt processing plus generation, buffered finalized response",
+  "hardware": {
+    "system": "NVIDIA DGX Spark",
+    "gpu": "GB10",
+    "compute_capability": "12.1",
+    "unified_memory_gb": 128
+  },
+  "runtime": {
+    "python": "3.12.3",
+    "torch": "2.11.0+cu130",
+    "transformers": "5.12.1",
+    "triton": "3.6.0",
+    "accelerate": "1.15.0",
+    "huggingface_hub": "1.33.0",
+    "safetensors": "0.8.0"
+  },
+  "startup_seconds": 14.317259561037645,
+  "cuda_after_load": {
+    "cuda_allocated_bytes": 18510780416,
+    "cuda_reserved_bytes": 18865979392,
+    "cuda_peak_allocated_bytes": 19318892544
+  },
+  "cuda_after_generation": {
+    "cuda_allocated_bytes": 18511227904,
+    "cuda_reserved_bytes": 18872270848,
+    "cuda_peak_allocated_bytes": 21907255296
+  },
+  "process_peak_rss_bytes": 9104658432,
+  "requests": {
+    "japanese": {
+      "wall_seconds": 0.3820920380530879,
+      "output_tokens_per_second": 23.55453425792018,
+      "delivered_ttft_seconds": 0.3820920380530879,
+      "usage": {
+        "prompt_tokens": 22,
+        "completion_tokens": 9,
+        "total_tokens": 31
+      },
+      "finish_reason": "stop",
+      "message": {
+        "role": "assistant",
+        "content": "動作確認できました。",
+        "reasoning_content": ""
+      },
+      "timings": {
+        "generation_seconds": 0.2926883799955249,
+        "first_finalized_canvas_seconds": 0.2924272849923,
+        "delivery": "buffered"
+      }
+    },
+    "throughput": {
+      "wall_seconds": 4.667935527977534,
+      "output_tokens_per_second": 63.19710249464693,
+      "delivered_ttft_seconds": 4.667935527977534,
+      "usage": {
+        "prompt_tokens": 27,
+        "completion_tokens": 295,
+        "total_tokens": 322
+      },
+      "finish_reason": "stop",
+      "message": {
+        "role": "assistant",
+        "content": "キャッシュ（Cache）とは、コンピュータやネットワークにおいて、**頻繁に利用するデータやプログラムを一時的に的にするための高速な記憶領域**のことです。\n\n**【仕組み】**\n通常、データはCPU（処理装置）から離れたメインメモリやストレージ（SSD/HDD）に保存されています。しかし、CPUが毎回これらからデータを読み出すと時間がかかり、待ち時間が発生します。そこで、CPUとメインメモリの間に「キャッシュメモリ」という中継地点を置き、よく使用するデータをあらかじめコピーしておきます。\n次に同じデータが必要になった際、メインメモリまで行く代わりに、キャッシュから即座に読み出すことで処理を高速化します。これを「キャッシュヒット」、データがない場合は「キャッシュミス」と呼びます。\n\n**【利点】**\n最大の利点は、**「処理速度の劇的な向上」**です。データへのアクセス時間が短縮されることで、アプリケーションの動作やウェブサイトの表示がスムーズになります。また、**リソースの節約**にも寄与します。メインメモリやストレージへのアクセス回数が減るため、システム全体の負荷が抑えられ、効率的なデータ処理が可能になります。\n\n現代のIT技術において、ブラウザのキャッシュ、サーバーのキャッシュ、CPU内キャッシュなど、キャッシュの仕組みはあらゆる所に採用されており、快適なデジタル体験を支える不可欠な技術となっています。",
+        "reasoning_content": ""
+      },
+      "timings": {
+        "generation_seconds": 4.567857727990486,
+        "first_finalized_canvas_seconds": 3.2161285349866375,
+        "delivery": "buffered"
+      }
+    },
+    "long_input": {
+      "wall_seconds": 4.063509959960356,
+      "output_tokens_per_second": 2.4609266615646637,
+      "delivered_ttft_seconds": 4.063509959960356,
+      "usage": {
+        "prompt_tokens": 8527,
+        "completion_tokens": 10,
+        "total_tokens": 8537
+      },
+      "finish_reason": "stop",
+      "message": {
+        "role": "assistant",
+        "content": "紫陽花42",
+        "reasoning_content": ""
+      },
+      "timings": {
+        "generation_seconds": 3.953781083924696,
+        "first_finalized_canvas_seconds": 3.953635769081302,
+        "delivery": "buffered"
+      }
+    },
+    "native_tool_call": {
+      "wall_seconds": 0.42959576298017055,
+      "output_tokens_per_second": 32.58877578977942,
+      "delivered_ttft_seconds": 0.42959576298017055,
+      "usage": {
+        "prompt_tokens": 81,
+        "completion_tokens": 14,
+        "total_tokens": 95
+      },
+      "finish_reason": "tool_calls",
+      "message": {
+        "role": "assistant",
+        "content": "<tool_call|>",
+        "reasoning_content": "",
+        "tool_calls": [
+          {
+            "type": "function",
+            "function": {
+              "name": "read_marker",
+              "arguments": "{}"
+            }
+          }
+        ]
+      },
+      "timings": {
+        "generation_seconds": 0.3243916309438646,
+        "first_finalized_canvas_seconds": 0.32413240801543,
+        "delivery": "buffered"
+      }
+    },
+    "native_tool_response": {
+      "wall_seconds": 1.3870495180599391,
+      "output_tokens_per_second": 53.3506547794368,
+      "delivered_ttft_seconds": 1.3870495180599391,
+      "usage": {
+        "prompt_tokens": 118,
+        "completion_tokens": 74,
+        "total_tokens": 192
+      },
+      "finish_reason": "stop",
+      "message": {
+        "role": "assistant",
+        "content": "read_markerツールを使用して取得した合言葉は「桔梗73」です。",
+        "reasoning_content": "The user wants to get a passphrase (合言葉) using the `read_marker` tool.\nI have already called `read_marker()` and received `{\"marker\":\"桔梗73\"}`.\nI should now present this result to the user."
+      },
+      "timings": {
+        "generation_seconds": 1.288674897979945,
+        "first_finalized_canvas_seconds": 1.2884672930231318,
+        "delivery": "buffered"
+      }
+    },
+    "thinking_1": {
+      "wall_seconds": 2.178200351074338,
+      "output_tokens_per_second": 148.74664758923385,
+      "delivered_ttft_seconds": 2.178200351074338,
+      "usage": {
+        "prompt_tokens": 59,
+        "completion_tokens": 324,
+        "total_tokens": 383
+      },
+      "finish_reason": "stop",
+      "message": {
+        "role": "assistant",
+        "content": "17 × 19 + 23 を計算します。\n\nまず、17 × 19 を計算します。\n17 × 19 = 17 × (20 - 1) = 340 - 17 = 323\n\n次に、その結果に 23 を足します。\n323 + 23 = 346\n\n答えは346です。",
+        "reasoning_content": "*   Expression: $17 \\times 19 + 23$\n    *   Step 1: Calculate $17 \\times 19$.\n        *   $17 \\times 19 = 17 \\times (20 - 1) = 340 - 17 = 323$.\n        *   Alternatively, $17 \\times 19 = (18 - 1) \\times 19 = 342 - 19 = 323$.\n    *   Step 2: Add 23 to the result.\n        *   $323 + 23 = 346$.\n\n    *   $17 \\times 19 = 323$\n    *   $323 + 23 = 346$\n\n    *   The requested format is: \"答えは[数値]です。\"\n    *   The user asked for the thinking process (intermediate steps) followed by the final answer."
+      },
+      "timings": {
+        "generation_seconds": 2.087374767055735,
+        "first_finalized_canvas_seconds": 1.631678526988253,
+        "delivery": "buffered"
+      }
+    },
+    "thinking_2": {
+      "wall_seconds": 2.3938102829270065,
+      "output_tokens_per_second": 128.66516707556133,
+      "delivered_ttft_seconds": 2.3938102829270065,
+      "usage": {
+        "prompt_tokens": 59,
+        "completion_tokens": 308,
+        "total_tokens": 367
+      },
+      "finish_reason": "stop",
+      "message": {
+        "role": "assistant",
+        "content": "17 × 19 = 323 なので、323 + 23 = 346 となります。\n\n答えは346です。",
+        "reasoning_content": "*   Expression: $17 \\times 19 + 23$\n\n    *   Step 1: Calculate $17 \\times 19$.\n        *   Method A: $17 \\times 19 = 17 \\times (20 - 1) = 340 - 17 = 323$.\n        *   Method B: $17 \\times 19 = (18 - 1) \\times (18 + 1) = 18^2 - 1 = 324 - 1 = 323$.\n        *   Method C: $17 \\times 19 = 170 + 153 = 323$.\n    *   Step 2: Add 23 to the result.\n        *   $323 + 23 = 346$.\n\n    *   $17 \\times 19 = 323$ (Correct)\n    *   $323 + 23 = 346$ (Correct)\n\n    *   The format is \"答えは[数値]です。\"\n    *   答えは346です。"
+      },
+      "timings": {
+        "generation_seconds": 2.304833044996485,
+        "first_finalized_canvas_seconds": 1.4798880430171266,
+        "delivery": "buffered"
+      }
+    },
+    "thinking_3": {
+      "wall_seconds": 1.6903509279945865,
+      "output_tokens_per_second": 148.48987618079022,
+      "delivered_ttft_seconds": 1.6903509279945865,
+      "usage": {
+        "prompt_tokens": 59,
+        "completion_tokens": 251,
+        "total_tokens": 310
+      },
+      "finish_reason": "stop",
+      "message": {
+        "role": "assistant",
+        "content": "答えは346です。",
+        "reasoning_content": "*   Expression: $17 \\times 19 + 23$\n    *   Step 1: Calculate $17 \\times 19$.\n        *   $17 \\times 19 = 17 \\times (20 - 1)$\n        *   $17 \\times 20 = 340$\n        *   $340 - 17 = 323$\n        *   Alternatively: $17 \\times 19 = (18-1)(18+1) = 18^2 - 1 = 324 - 1 = 323$.\n    *   Step 2: Add 23 to the result.\n        *   $323 + 23 = 346$.\n\n    *   $17 \\times 19 = 323$\n    *   $323 + 23 = 346$\n\n    *   The format is \"答えは[数値]です。\"\n\n    答えは346です。"
+      },
+      "timings": {
+        "generation_seconds": 1.599359679967165,
+        "first_finalized_canvas_seconds": 1.5990604730322957,
+        "delivery": "buffered"
+      }
+    },
+    "japanese_prose_repeat": {
+      "wall_seconds": 3.377861763932742,
+      "output_tokens_per_second": 83.78081158374926,
+      "delivered_ttft_seconds": 3.377861763932742,
+      "usage": {
+        "prompt_tokens": 27,
+        "completion_tokens": 283,
+        "total_tokens": 310
+      },
+      "finish_reason": "stop",
+      "message": {
+        "role": "assistant",
+        "content": "キャッシュ（Cache）とは、頻繁に使用するデータやプログラムを一時的に記憶しておくことで、コンピュータの処理を高速化する仕組みのことです。\n\n**【仕組み】**\n通常、コンピュータがデータを処理する際、CPUはメインメモリ（RAM）やストレージ（SSD/HDD）からデータを読み出しますが、これらには時間がかかります。そこで、CPUとメインメモリの間に、高速で動作する「キャッシュメモリ」を配置します。\nCPUがデータを要求した際、まずキャッシュ内を確認し、目的のデータがあれば（キャッシュヒット）、即座に読み出して処理を開始します。キャッシュにない場合は（キャッシュミス）、メインメモリなどからデータを読み出し、次回のためにに備えてキャッシュにも保存します。\n\n**【利点】**\nキャッシュの最大の利点は、**処理速度の劇的な向上**です。頻繁にアクセスするデータを近くに置いておくことで、CPUの待ち時間を短縮し、システム全体の動作をスムーズにします。また、メインメモリやストレージへのアクセス負荷を軽減し、データ転送効率を高める効果もあります。\n\n現代のITシステムでは、CPU内部のキャッシュ、Webブラウザのキャッシュ、データベースのキャッシュなど、あらゆる階層でこの技術が活用されており、私たちは意識せずともキャッシュの恩恵によって高速なデジタル体験をできています。",
+        "reasoning_content": ""
+      },
+      "timings": {
+        "generation_seconds": 3.2874288950115442,
+        "first_finalized_canvas_seconds": 2.060815752018243,
+        "delivery": "buffered"
+      }
+    }
+  },
+  "complete": true,
+  "thinking_checks": {
+    "1": {
+      "correct_final_answer": true,
+      "separate_reasoning": true
+    },
+    "2": {
+      "correct_final_answer": true,
+      "separate_reasoning": true
+    },
+    "3": {
+      "correct_final_answer": true,
+      "separate_reasoning": true
+    }
+  },
+  "application_checks": {
+    "japanese": true,
+    "reasoning_and_final_answer": true,
+    "actual_terminal_execution": true,
+    "temporary_credentials_revoked": true
+  },
+  "scope_note": "Original integration evidence. Standalone runner validation is reported separately."
+}

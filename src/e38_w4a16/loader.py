@@ -1,0 +1,138 @@
+"""Opt-in loading of the pinned Goedel kernels with the verified E38 overlay."""
+from __future__ import annotations
+
+import hashlib
+import importlib
+import importlib.abc
+import importlib.machinery
+import importlib.util
+import os
+from pathlib import Path
+import sys
+
+from . import checkpoint
+
+
+class _PinnedImports(importlib.abc.MetaPathFinder):
+    def __init__(self, root, spec):
+        self.root = root
+        self.paths = {}
+        for record in spec['files']:
+            name = record['path']
+            if not name.endswith('.py'):
+                continue
+            relative = Path(name)
+            module = '.'.join(relative.with_suffix('').parts)
+            self.paths[module] = root / relative
+            if relative.parent == Path('kernels'):
+                self.paths[relative.stem] = root / relative
+
+    def validate_cache(self):
+        for name, expected in self.paths.items():
+            existing = sys.modules.get(name)
+            if existing is not None:
+                origin = getattr(existing, '__file__', None)
+                if origin is None or Path(origin).resolve() != expected.resolve():
+                    raise RuntimeError(f'Module {name} belongs to another checkpoint; use a fresh process')
+        package = sys.modules.get('kernels')
+        if package is not None and list(getattr(package, '__path__', ())) != [str(self.root / 'kernels')]:
+            raise RuntimeError('The kernels package belongs to another checkpoint; use a fresh process')
+
+    def find_spec(self, fullname, path=None, target=None):
+        if fullname == 'kernels':
+            spec = importlib.machinery.ModuleSpec(fullname, loader=None, is_package=True)
+            spec.submodule_search_locations = [str(self.root / 'kernels')]
+            return spec
+        source = self.paths.get(fullname)
+        if source is not None:
+            return importlib.util.spec_from_file_location(fullname, source)
+        return None
+
+
+def _check_extra_code(root, spec):
+    listed = {item['path'] for item in spec['files']}
+    executable_suffixes = {'.py', '.pyc', '.so', '.pyd', '.dll', '.dylib', '.safetensors'}
+    for directory, directories, files in os.walk(root, followlinks=False):
+        relative_dir = Path(directory).relative_to(root)
+        # HF metadata is never placed on the custom-code import path.
+        if relative_dir == Path('.'):
+            directories[:] = [name for name in directories if name != '.cache']
+        for name in directories:
+            candidate = Path(directory) / name
+            if candidate.is_symlink():
+                raise ValueError(f'Checkpoint contains a directory symlink: {candidate.relative_to(root)}')
+        for name in files:
+            candidate = Path(directory) / name
+            relative = candidate.relative_to(root).as_posix()
+            if candidate.is_symlink():
+                raise ValueError(f'Checkpoint contains a file symlink: {relative}')
+            if relative not in listed and candidate.suffix in executable_suffixes:
+                raise ValueError(f'Unlisted checkpoint code or weights: {relative}')
+
+
+
+def _apply_overlay(model, root, receipt):
+    import torch
+    from safetensors import safe_open
+
+    replacements = []
+    with safe_open(str(root / checkpoint.OVERLAY_FILE), framework='pt', device='cpu') as source:
+        if set(source.keys()) != set(checkpoint.TENSOR_SHAPES):
+            raise ValueError('The overlay tensor key set differs')
+        for record in receipt['tensors']:
+            name, shape = record['name'], tuple(record['shape'])
+            tensor = source.get_tensor(name)
+            if tensor.dtype != torch.bfloat16 or tuple(tensor.shape) != shape:
+                raise ValueError(f'Overlay tensor dtype or shape differs: {name}')
+            raw = tensor.contiguous().view(torch.uint8).numpy().tobytes()
+            if hashlib.sha256(raw).hexdigest() != record['sha256']:
+                raise ValueError(f'Overlay raw tensor checksum differs: {name}')
+            target = model.get_parameter(name)
+            encoder = model.get_parameter(name.replace('model.decoder.', 'model.encoder.language_model.', 1))
+            if (not isinstance(target, torch.nn.Parameter) or target is not encoder or target.is_meta
+                    or target.dtype != torch.bfloat16 or tuple(target.shape) != shape):
+                raise ValueError(f'Expected an existing, tied BF16 model parameter: {name}')
+            replacements.append((target, tensor))
+    # Validate every tensor and alias before any parameter is changed. Copying
+    # preserves the encoder aliases and the original packed expert buffers.
+    with torch.no_grad():
+        for target, tensor in replacements:
+            target.copy_(tensor.to(device=target.device, dtype=target.dtype))
+    return len(replacements)
+
+
+def load_model(base_path, overlay_path, *, trust_base_code=False):
+    """Return ``(model, tokenizer, metadata)`` using CUDA and Goedel's turbo tier.
+
+    ``trust_base_code=True`` is required because the pinned base includes Python
+    and Triton code. All base files are rehashed before importing that code. Use
+    a fresh process when switching checkpoints: the upstream fast sampler also
+    patches Transformers process state.
+    """
+    if trust_base_code is not True:
+        raise ValueError('Loading custom kernels requires trust_base_code=True')
+    base = checkpoint._root(base_path)
+    overlay = checkpoint._root(overlay_path)
+    spec = checkpoint.verify_snapshot(base, 'base')
+    receipt = checkpoint.verify_overlay(overlay)
+    _check_extra_code(base, spec)
+    imports = _PinnedImports(base, spec)
+    imports.validate_cache()
+    old_path = list(sys.path)
+    old_bytecode = sys.dont_write_bytecode
+    sys.dont_write_bytecode = True
+    sys.meta_path.insert(0, imports)
+    try:
+        loader = importlib.import_module('kernels.load_w4_checkpoint')
+        model, tokenizer = loader.load_fast(str(base), device='cuda', tier='turbo')
+        changed = _apply_overlay(model, overlay, receipt)
+    finally:
+        sys.meta_path.remove(imports)
+        sys.path[:] = old_path
+        sys.dont_write_bytecode = old_bytecode
+    return model, tokenizer, {
+        'format': checkpoint.FORMAT, 'base': receipt['base'], 'source': receipt['source'],
+        'overlay_sha256': receipt['files'][0]['sha256'], 'modified_dense_tensors': changed,
+        'execution': 'Goedel fast W4A16 turbo with dense BF16 E38 overlay',
+        'expert_requantization': False,
+    }
